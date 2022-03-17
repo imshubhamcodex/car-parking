@@ -94,19 +94,22 @@
     </template>
 
     <div id="container-bottom" class="pl-2 pr-2">
-      <div id="btn-nav">
+      <div v-if="currentSlide < 2 ? true : false" id="btn-nav">
         <v-btn
           text
-          color="primary"
+          color="deep-purple accent-3"
           @click="prevSlide"
-          :disabled="currentSlide === 0 ? true : false"
+          :disabled="currentSlide <= 0 ? true : false"
         >
           {{ currentSlide === 0 ? "SKIP" : "BACK" }}
         </v-btn>
-        <v-btn text color="primary" @click="nextSlide">
+        <v-btn text color="deep-purple accent-3" @click="nextSlide">
           {{ currentSlide === 2 ? "FINISH" : "NEXT" }}
         </v-btn>
       </div>
+      <v-btn v-else id="started" large dark color="deep-purple accent-3">
+        GET STARTED
+      </v-btn>
     </div>
   </div>
 </template>
@@ -138,6 +141,9 @@ export default {
 <style scoped>
 p {
   font-family: "Roboto";
+}
+#started {
+  width: 100%;
 }
 #btn-nav {
   display: flex;
