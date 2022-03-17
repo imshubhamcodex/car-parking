@@ -26,7 +26,7 @@
     <v-btn class="btns mb-7" large dark color="deep-purple accent-3">
         LOGIN
       </v-btn>
-      <v-btn text class="btns mb-15" disabled large  color="deep-purple accent-3">
+      <v-btn text class="btns mb-15"  large  color="deep-purple accent-3">
         SIGN UP
       </v-btn>
     </div>
