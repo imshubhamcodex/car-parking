@@ -97,17 +97,18 @@
       <div v-if="currentSlide < 2 ? true : false" id="btn-nav">
         <v-btn
           text
+          outlined
           color="deep-purple accent-3"
           @click="prevSlide"
           :disabled="currentSlide <= 0 ? true : false"
         >
           {{ currentSlide === 0 ? "SKIP" : "BACK" }}
         </v-btn>
-        <v-btn text color="deep-purple accent-3" @click="nextSlide">
+        <v-btn text outlined color="deep-purple accent-3" @click="nextSlide">
           {{ currentSlide === 2 ? "FINISH" : "NEXT" }}
         </v-btn>
       </div>
-      <v-btn v-else id="started" large dark color="deep-purple accent-3">
+      <v-btn @click="goToLogin" v-else id="started" large dark color="deep-purple accent-3">
         GET STARTED
       </v-btn>
     </div>
@@ -133,6 +134,9 @@ export default {
         this.currentSlide--;
         document.getElementsByTagName("button")[this.currentSlide].click();
       }
+    },
+    goToLogin() {
+      this.$router.push("/login");
     },
   },
 };

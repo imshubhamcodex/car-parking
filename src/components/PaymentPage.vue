@@ -19,7 +19,9 @@
             <p class="font-weight-bold">Acquired Slots</p>
           </div>
           <div>
-            <p class="font-weight-bold">{{ no_of_slots }} {{ no_of_slots > 1 ? "(Slots)" : "(Slot)" }}</p>
+            <p class="font-weight-bold">
+              {{ no_of_slots }} {{ no_of_slots > 1 ? "(Slots)" : "(Slot)" }}
+            </p>
           </div>
         </div>
         <div class="hz-align">
@@ -27,7 +29,9 @@
             <p class="font-weight-bold">Estimated Duration</p>
           </div>
           <div>
-            <p class="font-weight-bold">{{ no_of_hours }} {{ no_of_hours > 1 ? "(Hrs)" : "(Hr)" }}</p>
+            <p class="font-weight-bold">
+              {{ no_of_hours }} {{ no_of_hours > 1 ? "(Hrs)" : "(Hr)" }}
+            </p>
           </div>
         </div>
         <div class="hz-align">
@@ -88,7 +92,7 @@
             <v-card-text>
               <div id="booked-div" v-if="spot_booked">
                 <img src="../assets/tick.svg" alt="" />
-                <p class="text-h5">
+                <p class="text-h5 mt-3">
                   {{ no_of_slots > 1 ? "Slots" : "Slot" }} Successfully Booked
                 </p>
                 <p>Notifying Security Guards</p>
@@ -103,7 +107,11 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="deep-purple accent-3" text @click="dialog = false">
+              <v-btn
+                color="deep-purple accent-3"
+                text
+                @click="goToBookingsDetails"
+              >
                 Close
               </v-btn>
             </v-card-actions>
@@ -115,7 +123,6 @@
 </template>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-// import axios from "axios";
 export default {
   data() {
     return {
@@ -131,6 +138,12 @@ export default {
     };
   },
   methods: {
+    goToBookingsDetails() {
+      this.dialog = false;
+      if (this.razorpay_payment_id !== null) {
+        this.$router.push("/booking-details");
+      }
+    },
     makePayment() {
       const options = {
         key: process.env.VUE_APP_RAZORPAY_KEY_ID,
@@ -163,6 +176,9 @@ export default {
       this.spot_booked = true;
       this.dialog = true;
       this.razorpay_payment_id = response.razorpay_payment_id;
+      this.$store.commit("setPaymentID", response.razorpay_payment_id);
+      this.$store.commit("setPaymentAmount", this.amount);
+      this.$store.commit("setUpcomingList");
     },
     onPaymentFailure(response) {
       this.razorpay_payment_id = null;
@@ -171,7 +187,9 @@ export default {
       console.log(response);
     },
   },
-  mounted() {},
+  mounted() {
+    this.$store.commit("setPaymentID", null);
+  },
 };
 </script>
 

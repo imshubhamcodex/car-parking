@@ -9,6 +9,7 @@ import home from "../components/Home.vue";
 import booking from "../components/Booking.vue";
 import payment from "../components/PaymentPage.vue";
 import bookingDetails from "../components/BookingDetails.vue";
+import page_not_found from "../components/PageNotFound.vue";
 
 Vue.use(VueRouter);
 
@@ -45,7 +46,10 @@ const routes = [
     path: "/booking-details",
     component: bookingDetails,
   },
-
+  {
+    path: "*",
+    component: page_not_found,
+  },
 ];
 
 const router = new VueRouter({

@@ -6,7 +6,7 @@
     <div id="search-box">
       <v-autocomplete
         v-model="search_location"
-        :items="location_list"
+        :items="location_list_names"
         prepend-inner-icon="mdi-map-marker"
         solo
         label=" Where are you going ?"
@@ -15,7 +15,7 @@
     </div>
 
     <div
-      v-if="location_list.includes(search_location) ? true : false"
+      v-if="location_list_names.includes(search_location) ? true : false"
       class="middle-div"
       id="selected-div"
     >
@@ -28,7 +28,16 @@
         >
           <div><p class="text-overline">Spaces Available:</p></div>
           <div>
-            <p class="text-overline font-weight-bold">{{ spot_avail }} slots</p>
+            <p class="text-overline font-weight-bold">
+              {{
+                location_list[
+                  location_list.findIndex(
+                    (item) => item.name === search_location
+                  )
+                ].spot_avail
+              }}
+              slots
+            </p>
           </div>
         </div>
         <div class="hz-align pl-3 pr-3" style="justify-content: space-between">
@@ -38,7 +47,13 @@
               length="5"
               readonly
               size="15"
-              :value="spot_rating"
+              :value="
+                location_list[
+                  location_list.findIndex(
+                    (item) => item.name === search_location
+                  )
+                ].rating
+              "
             ></v-rating>
           </div>
         </div>
@@ -46,17 +61,28 @@
     </div>
 
     <div
-      v-if="location_list.includes(search_location) ? true : false"
+      v-if="location_list_names.includes(search_location) ? true : false"
       class="middle-div"
       id="book-btn-div"
     >
-      <v-btn class="" id="book-btn" large dark color="deep-purple accent-3">
+      <v-btn
+        :disabled="
+          search_location === null || search_location.trim() === ''
+            ? true
+            : false
+        "
+        @click="lockLocation"
+        id="book-btn"
+        large
+        dark
+        color="deep-purple accent-3"
+      >
         Continue
       </v-btn>
     </div>
 
     <div
-      v-if="location_list.includes(search_location) ? false : true"
+      v-if="location_list_names.includes(search_location) ? false : true"
       class="middle-div"
     >
       <div>
@@ -74,7 +100,31 @@
           <v-list-item-content style="padding-bottom: 1px">
             <v-list-item-title class="v-list-item-title">
               <div class="pb-4" @click="openMenu(item.name)">
-                <v-icon class="pl-4">{{ item.icon }}</v-icon>
+                <v-icon class="pl-4" color="deep-purple accent-3">
+                  {{
+                    item.name === "history" && !showHistory
+                      ? item.icon
+                      : item.icon.split("-")[0] + "-" + item.icon.split("-")[1]
+                  }}
+
+                  {{
+                    item.name === "favorite" && !showFavorite
+                      ? item.icon
+                      : item.icon.split("-")[0] + "-" + item.icon.split("-")[1]
+                  }}
+
+                  {{
+                    item.name === "profile" && !showProfile
+                      ? item.icon
+                      : item.icon.split("-")[0] + "-" + item.icon.split("-")[1]
+                  }}
+
+                  {{
+                    item.name === "settings" && !showSettings
+                      ? item.icon
+                      : item.icon.split("-")[0] + "-" + item.icon.split("-")[1]
+                  }}
+                </v-icon>
               </div>
             </v-list-item-title>
           </v-list-item-content>
@@ -85,7 +135,7 @@
     <div v-if="showMenu" id="menu-div">
       <!--Fav list start-->
 
-      <div v-if="showFav" id="fav-parking-div">
+      <div v-if="showFavorite" id="fav-parking-div">
         <div class="fav-list-item list-head">
           <p class="text-h5 pt-3 pl-6">
             Favorite Spots
@@ -108,7 +158,10 @@
             v-for="item in favorite_list"
             :key="item.name"
           >
-            <v-list-item-content class="fav-list-item">
+            <v-list-item-content
+              @click="openFavLocation(item.name)"
+              class="fav-list-item"
+            >
               <div
                 class="hz-align pl-3 pr-3 pt-4"
                 style="justify-content: space-between"
@@ -116,7 +169,7 @@
                 <div>
                   <p class="text-h6">{{ item.name }}</p>
                 </div>
-                <div>
+                <div @click="removeFromFav(item.name)">
                   <v-icon class="mt-1" color="orange">mdi-star</v-icon>
                 </div>
               </div>
@@ -169,19 +222,40 @@
           <v-list-item
             class="mb-4 pl-2 pr-2"
             v-for="item in upcomimg_list"
-            :key="item.id + 'upcoming'"
+            :key="item.payment_id + 'upcoming'"
           >
             <v-list-item-content class="fav-list-item">
+              <v-rating
+                :length="item.rating"
+                readonly
+                :value="item.rating"
+                size="15"
+                color="yellow accent-4"
+                class="mt-n2"
+              ></v-rating>
+
               <div
-                class="hz-align pl-3 pr-3 pt-4"
+                class="hz-align pl-3 pr-3 mt-n2"
                 style="justify-content: space-between"
               >
                 <div>
-                  <p class="text-h6">{{ item.name }}</p>
-                  <p class="mt-n4">{{ item.spots }} spots</p>
+                  <p class="text-h6">{{ item.location }}</p>
+                  <p class="mt-n4">
+                    {{ item.no_of_slots }}
+                    {{ item.no_of_slots > 1 ? "spots" : "spot" }}
+                  </p>
                 </div>
                 <div>
-                  <v-icon class="mt-1" color="orange">mdi-timer-sand</v-icon>
+                  <v-btn
+                    @click="openBookingDetails(item.payment_id)"
+                    text
+                    fab
+                    elevation="3"
+                    small
+                    outlined
+                  >
+                    <v-icon color="">mdi-qrcode</v-icon>
+                  </v-btn>
                 </div>
               </div>
               <hr />
@@ -190,13 +264,13 @@
                 style="justify-content: space-between"
               >
                 <div>
-                  <p class="mt-2 mb-0">{{ item.date }}</p>
+                  <p class="mt-2 mb-0">{{ item.check_in_date }}</p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">{{ item.time }}</p>
+                  <p class="mt-2 mb-0">{{ item.check_in_time }}</p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">₹ {{ item.amount }}</p>
+                  <p class="mt-2 mb-0">₹ {{ item.payment_amount }}</p>
                 </div>
               </div>
             </v-list-item-content>
@@ -211,16 +285,28 @@
           <v-list-item
             class="mb-4 pl-2 pr-2"
             v-for="item in history_list"
-            :key="item.id + 'history'"
+            :key="item.payment_id + 'history'"
           >
             <v-list-item-content class="fav-list-item">
+              <v-rating
+                :length="item.rating"
+                readonly
+                :value="item.rating"
+                size="15"
+                color="yellow accent-4"
+                class="mt-n2"
+              ></v-rating>
+
               <div
-                class="hz-align pl-3 pr-3 pt-4"
+                class="hz-align pl-3 pr-3 pt-0 mt-n2"
                 style="justify-content: space-between"
               >
                 <div>
-                  <p class="text-h6">{{ item.name }}</p>
-                  <p class="mt-n4">{{ item.spots }} spots</p>
+                  <p class="text-h6">{{ item.location }}</p>
+                  <p class="mt-n4">
+                    {{ item.no_of_slots }}
+                    {{ item.no_of_slots > 1 ? "spots" : "spot" }}
+                  </p>
                 </div>
                 <div>
                   <v-icon class="mt-1" color="green">mdi-check-circle</v-icon>
@@ -232,13 +318,13 @@
                 style="justify-content: space-between"
               >
                 <div>
-                  <p class="mt-2 mb-0">{{ item.date }}</p>
+                  <p class="mt-2 mb-0">{{ item.check_in_date }}</p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">{{ item.time }}</p>
+                  <p class="mt-2 mb-0">{{ item.check_in_time }}</p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">₹ {{ item.amount }}</p>
+                  <p class="mt-2 mb-0">₹ {{ item.payment_amount }}</p>
                 </div>
               </div>
             </v-list-item-content>
@@ -275,7 +361,8 @@
             append-icon="mdi-account-outline"
             color="deep-purple accent-3"
             type="text"
-            v-model="user.name"
+            v-model="name"
+            :counter="20"
             outlined
           ></v-text-field>
           <v-text-field
@@ -283,28 +370,38 @@
             append-icon="mdi-cellphone-basic"
             color="deep-purple accent-3"
             type="number"
-            v-model="user.phone"
+            v-model="phone"
             outlined
+            :counter="10"
+            @keyup="validatePhone"
           ></v-text-field>
           <v-text-field
             label="Email"
             append-icon="mdi-email-outline"
             color="deep-purple accent-3"
             type="email"
-            v-model="user.email"
+            v-model="email"
+            :counter="35"
             outlined
           ></v-text-field>
           <v-text-field
             label="Password"
             append-icon="mdi-lock-outline"
             color="deep-purple accent-3"
-            type="password"
+            type="text"
             outlined
-            v-model="user.password"
+            v-model="password"
+            :counter="20"
           ></v-text-field>
         </div>
         <div id="save-btn-div">
-          <v-btn class="mb-12" large dark color="deep-purple accent-3">
+          <v-btn
+            :disabled="btnDisabled()"
+            class="mb-8 mt-4"
+            large
+            :dark="!btnDisabled()"
+            color="deep-purple accent-3"
+          >
             SAVE
           </v-btn>
         </div>
@@ -392,7 +489,13 @@
           </template>
         </div>
         <div id="logout-btn-div">
-          <v-btn class="mb-3" large dark color="deep-purple accent-3">
+          <v-btn
+            @click="goToLogin"
+            class="mb-3"
+            large
+            dark
+            color="deep-purple accent-3"
+          >
             LOGOUT
           </v-btn>
         </div>
@@ -406,7 +509,15 @@
 export default {
   data() {
     return {
-      location_list: ["Lekki Gardens Car Park", "Josh's Ground Car Park"],
+      location_list: [],
+      favorite_list: [],
+      history_list: [],
+      upcomimg_list: [],
+      location_list_names: [],
+      name: "",
+      phone: "",
+      email: "",
+      password: "",
       menu_icon: [
         {
           name: "favorite",
@@ -425,103 +536,10 @@ export default {
           icon: "mdi-cog-outline",
         },
       ],
-      favorite_list: [
-        {
-          name: "Lekki Gardens Car Park",
-          rating: 2,
-        },
-        {
-          name: "Josh's Ground Car Park",
-          rating: 5,
-        },
-        {
-          name: "Boss Gardens Car Park",
-          rating: 2,
-        },
-        {
-          name: "Andrew Ground Car Park",
-          rating: 5,
-        },
-        {
-          name: "Sara Gardens Car Park",
-          rating: 3,
-        },
-        {
-          name: "Jhon Ground Car Park",
-          rating: 3.5,
-        },
-      ],
-
-      history_list: [
-        {
-          name: "Lekki Gardens Car Park",
-          spots: 2,
-          time: "15:00",
-          duration: "10",
-          date: "12/12/2020",
-          amount: 100,
-          id: 0,
-        },
-        {
-          name: "Josh's Ground Car Park",
-          spots: 2,
-          time: "15:00",
-          duration: "10",
-          date: "12/12/2020",
-          amount: 100,
-          id: 1,
-        },
-        {
-          name: "Boss Gardens Car Park",
-          spots: 2,
-          time: "15:00",
-          duration: "10",
-          date: "12/12/2020",
-          amount: 100,
-          id: 2,
-        },
-        {
-          name: "Andrew Ground Car Park",
-          spots: 2,
-          time: "15:00",
-          duration: "10",
-          date: "12/12/2020",
-          amount: 100,
-          id: 3,
-        },
-      ],
-      upcomimg_list: [
-        {
-          name: "Boss Gardens Car Park",
-          spots: 2,
-          time: "10:00",
-          duration: "10",
-          date: "12/12/2022",
-          amount: 100,
-          id: 0,
-        },
-        {
-          name: "Andrew Ground Car Park",
-          spots: 2,
-          time: "19:00",
-          duration: "10",
-          date: "12/12/2022",
-          amount: 100,
-          id: 1,
-        },
-      ],
-      user: {
-        name: "John Doe",
-        phone: "1234567890",
-        email: "edwssm777@gmail.com",
-        password: "12345678",
-      },
       search_location: "",
-      spot_avail: 10,
-      spot_rating: 4,
       showTandC: false,
       showPrivacy: false,
-      showFav: false,
+      showFavorite: false,
       showHistory: false,
       showProfile: false,
       showSettings: false,
@@ -529,26 +547,64 @@ export default {
     };
   },
   methods: {
+    goToLogin() {
+      this.$router.push("/login");
+    },
+    openBookingDetails(id) {
+      const findIndex = this.upcomimg_list.findIndex(
+        (item) => item.payment_id === id
+      );
+      this.$store.commit("setBookingsDetails", this.upcomimg_list[findIndex]);
+      this.$router.push("/booking-details");
+    },
+    openFavLocation(name) {
+      const index = this.favorite_list.findIndex((item) => item.name === name);
+      if (index >= 0) {
+        this.search_location = this.favorite_list[index].name;
+        this.closeMenu();
+      }
+    },
+
+    validatePhone() {
+      if (this.phone.length > 10) {
+        this.phone = this.phone.substring(0, 10);
+      }
+      if (!/^[6-9]/.test(this.phone.substring(0, 1))) {
+        this.phone = "";
+      }
+    },
+    btnDisabled() {
+      if (
+        this.name.length < 3 ||
+        this.phone.length < 10 ||
+        this.email.length < 5 ||
+        !/^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/.test(this.email) ||
+        this.password.length < 6
+      )
+        return true;
+
+      return false;
+    },
     openMenu(item) {
       this.showMenu = true;
       if (item === "favorite") {
-        this.showFav = true;
+        this.showFavorite = true;
         this.showHistory = false;
         this.showProfile = false;
         this.showSettings = false;
       } else if (item === "history") {
         this.showHistory = true;
-        this.showFav = false;
+        this.showFavorite = false;
         this.showProfile = false;
         this.showSettings = false;
       } else if (item === "profile") {
         this.showProfile = true;
-        this.showFav = false;
+        this.showFavorite = false;
         this.showHistory = false;
         this.showSettings = false;
       } else if (item === "settings") {
         this.showSettings = true;
-        this.showFav = false;
+        this.showFavorite = false;
         this.showHistory = false;
         this.showProfile = false;
       }
@@ -556,10 +612,44 @@ export default {
     closeMenu() {
       this.showMenu = false;
       this.showSettings = false;
-      this.showFav = false;
+      this.showFavorite = false;
       this.showHistory = false;
       this.showProfile = false;
     },
+    removeFromFav(name) {
+      const index = this.favorite_list.findIndex((item) => item.name === name);
+      this.favorite_list.splice(index, 1);
+      this.$store.commit("setFavList", this.favorite_list);
+    },
+    lockLocation() {
+      const lockedLocation =
+        this.location_list[
+          this.location_list.findIndex(
+            (item) => item.name === this.search_location
+          )
+        ];
+      this.$store.commit("lockLocation", lockedLocation);
+
+      this.$router.push("/booking");
+    },
+  },
+  mounted() {
+    this.location_list = this.$store.state.location_list;
+    this.favorite_list = this.$store.state.favorite_list;
+    this.history_list = this.$store.state.history_list;
+    this.upcomimg_list = this.$store.state.upcomimg_list;
+    const user = this.$store.state.user;
+    this.name = user.name;
+    this.phone = user.phone;
+    this.email = user.email;
+    this.password = user.password;
+    this.location_list.forEach((location) => {
+      this.location_list_names.push(location.name);
+    });
+  },
+  created() {
+    this.$store.commit("lockLocation", null);
+    this.$store.commit("setBookingsDetails", null);
   },
 };
 </script>

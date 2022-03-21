@@ -28,7 +28,7 @@
             step="1"
             ticks="always"
             tick-size="4"
-            :max="5"
+            :max="maxBookingSlots"
             color="deep-purple accent-3"
           ></v-slider>
         </div>
@@ -82,7 +82,8 @@
         @click="bookSpace"
         class="mb-12"
         large
-        dark
+        :dark="!isDisabled()"
+        :disabled="isDisabled()"
         color="deep-purple accent-3"
       >
         Book Space
@@ -107,13 +108,8 @@
                 v-if="showDate"
                 v-model="check_in_date"
                 show-adjacent-months
+                :min="new Date().toISOString().substr(0, 10)"
               ></v-date-picker>
-
-              <!-- <div id="booked-div" v-if="spot_booked">
-                <img src="../assets/tick.svg" alt="" />
-                <p class="text-h5">Space Successfully Booked</p>
-                <p>Notifying Security Guards</p>
-              </div> -->
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -132,36 +128,59 @@
 export default {
   data() {
     return {
-      search_location: "Lekki Gardens Car Park",
+      search_location: "",
+      maxBookingSlots: 0,
       no_of_slots: 0,
       no_of_hours: 0,
       check_in_time: "",
       check_in_date: "",
       showTime: false,
       showDate: false,
-      spot_booked: false,
       dialog: false,
     };
   },
   methods: {
+    isDisabled() {
+      if (
+        this.no_of_slots <= 0 ||
+        this.no_of_hours <= 0 ||
+        this.check_in_time.trim() == "" ||
+        this.check_in_date.trim() == ""
+      ) {
+        return true;
+      }
+      return false;
+    },
     openTimeDialog() {
       this.showTime = true;
       this.showDate = false;
-      this.spot_booked = false;
       this.dialog = true;
     },
     openDateDialog() {
       this.showTime = false;
       this.showDate = true;
-      this.spot_booked = false;
       this.dialog = true;
     },
     bookSpace() {
-      //   this.showTime = false;
-      //   this.showDate = false;
-      //   this.dialog = true;
-      //   this.spot_booked = true;
+      this.$store.commit("setBookingsDetails", {
+        no_of_slots: this.no_of_slots,
+        no_of_hours: this.no_of_hours,
+        check_in_time: this.check_in_time,
+        check_in_date: this.check_in_date,
+        location: this.search_location,
+        payment_id: null,
+        rating: this.$store.state.locked_location.rating,
+      });
+
+      this.$router.push("/payment");
     },
+  },
+  mounted() {
+    this.search_location = this.$store.state.locked_location.name;
+    this.maxBookingSlots =
+      this.$store.state.locked_location.spot_avail > 5
+        ? 5
+        : this.$store.state.locked_location.spot_avail;
   },
 };
 </script>

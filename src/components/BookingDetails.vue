@@ -18,10 +18,10 @@
     </div>
     <div id="container">
       <v-card elevation="10" class="pt-3 pl-5 pr-5">
-      <p class=" font-weight-bold">BOOKING DETAILS</p>
+        <p class="font-weight-bold">BOOKING DETAILS</p>
         <div class="hz-align">
           <div>
-            <p class="font-weight-bold" >Total Slots</p>
+            <p class="font-weight-bold">Total Slots</p>
           </div>
           <div>
             <p class="font-weight-bold">
@@ -72,6 +72,7 @@
         large
         dark
         color="deep-purple accent-3"
+        @click="backToHome"
       >
         Back to Home
       </v-btn>
@@ -84,15 +85,18 @@ import QRious from "qrious";
 export default {
   data() {
     return {
-      search_location: "Lekki Gardens Car Park",
-      no_of_slots: 5,
-      no_of_hours: 10,
-      check_in_time: "15:06",
-      check_in_date: "2020-06-01",
-      razorpay_payment_id: "hahaha",
+      search_location: null,
+      no_of_slots: 0,
+      no_of_hours: 0,
+      check_in_time: "00:00",
+      check_in_date: "0000-00-00",
+      razorpay_payment_id: null,
     };
   },
   methods: {
+    backToHome() {
+      this.$router.push("/home");
+    },
     generateQR() {
       new QRious({
         element: document.getElementById("qrcode"),
@@ -103,6 +107,14 @@ export default {
     },
   },
   mounted() {
+    let booking_details = this.$store.state.booking_details;
+    this.no_of_slots = booking_details.no_of_slots;
+    this.no_of_hours = booking_details.no_of_hours;
+    this.check_in_time = booking_details.check_in_time;
+    this.check_in_date = booking_details.check_in_date;
+    this.search_location = booking_details.location;
+    this.razorpay_payment_id = booking_details.payment_id;
+
     this.generateQR();
   },
 };

@@ -12,7 +12,13 @@
 </template>
 
 <script>
-export default {};
+export default {
+  mounted() {
+    setTimeout(() => {
+      this.$router.push("/onboarding");
+    }, 3000);
+  },
+};
 </script>
 
 <style scoped>
@@ -33,7 +39,7 @@ p {
   width: 100%;
   display: block;
 }
-#container-bottom > img{
+#container-bottom > img {
   margin: 0 auto;
   width: 100%;
   display: block;

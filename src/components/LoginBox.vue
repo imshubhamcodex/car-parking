@@ -9,6 +9,9 @@
           append-icon="mdi-cellphone-basic"
           color="deep-purple accent-3"
           type="number"
+          :counter="10"
+          @keyup="phoneNumberChange"
+          v-model="phone"
         ></v-text-field>
         <v-text-field
           class="mt-3"
@@ -16,6 +19,8 @@
           append-icon="mdi-lock-outline"
           color="deep-purple accent-3"
           type="password"
+          v-model="password"
+          :counter="20"
         ></v-text-field>
 
         <p>Forgot Password ?</p>
@@ -23,10 +28,38 @@
     </div>
 
     <div id="container-bottom">
-    <v-btn class="btns mb-7" large dark color="deep-purple accent-3">
+      <v-btn
+        :disabled="
+          this.phone.trim() === '' ||
+          this.password.trim() === '' ||
+          this.phone.length < 10 ||
+          this.password.length < 6
+            ? true
+            : false
+        "
+        class="btns mb-7"
+        large
+        :dark="
+          this.phone.trim() === '' ||
+          this.password.trim() === '' ||
+          this.phone.length < 10 ||
+          this.password.length < 6
+            ? false
+            : true
+        "
+        color="deep-purple accent-3"
+        @click="goForAuth"
+      >
         LOGIN
       </v-btn>
-      <v-btn text class="btns mb-15"  large  color="deep-purple accent-3">
+      <v-btn
+        outlined
+        text
+        class="btns mb-15"
+        large
+        color="deep-purple accent-3"
+        @click="goToSignup"
+      >
         SIGN UP
       </v-btn>
     </div>
@@ -34,14 +67,40 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      phone: "",
+      password: "",
+    };
+  },
+  methods: {
+    goToSignup() {
+      this.$router.push("/signup");
+    },
+    goForAuth() {
+
+      //if authenticated sucessfully
+      this.$router.push("/home");
+    },
+    phoneNumberChange() {
+      //  /^[789]\d{9}$/
+      if (this.phone.length > 10) {
+        this.phone = this.phone.substring(0, 10);
+      }
+      if (!/^[6-9]/.test(this.phone.substring(0, 1))) {
+        this.phone = "";
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
 p {
   font-family: "Roboto";
   float: right;
-  color: #651FFF;
+  color: #651fff;
 }
 .btns {
   width: 95%;
