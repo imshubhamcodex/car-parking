@@ -10,9 +10,7 @@
             <div class="contant_box_404">
               <h3 class="h2">Look like you're lost</h3>
 
-              <p>the page you are looking for not avaible!</p>
-
-              <v-btn text outlined elevation="3" class="mt-4">Got to home</v-btn>
+              <v-btn text outlined elevation="3" class="mt-4">Go to home</v-btn>
             </div>
           </div>
         </div>

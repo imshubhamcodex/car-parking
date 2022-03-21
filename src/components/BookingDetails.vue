@@ -14,7 +14,7 @@
     </div>
     <div id="qrcode-div">
       <canvas id="qrcode"></canvas>
-      <p class="mt-3">PAYMENT ID: {{ razorpay_payment_id }}</p>
+      <p id="pay-id" class="mt-3">PAYMENT ID: {{ razorpay_payment_id }}</p>
     </div>
     <div id="container">
       <v-card elevation="10" class="pt-3 pl-5 pr-5">
@@ -173,5 +173,11 @@ p {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+@media (max-width: 450px) {
+  #pay-id {
+    margin-top: -5px !important;
+  }
 }
 </style>
