@@ -95,7 +95,7 @@
       </div>
     </div>
     <div id="container-bottom">
-      <v-list class="pl-0 hz-align">
+      <v-list class="pl-0 pt-0 pb-0 hz-align">
         <v-list-item v-for="item in menu_icon" :key="item.name" link>
           <v-list-item-content style="padding-bottom: 1px">
             <v-list-item-title class="v-list-item-title">
@@ -660,7 +660,7 @@ p {
 }
 #menu-div {
   position: absolute;
-  height: 90.7vh;
+  height: 91.6vh;
   width: 100%;
   z-index: 99;
   background: rgb(236, 236, 236);
@@ -731,7 +731,7 @@ p {
 }
 #search-box {
   position: absolute;
-  top: 15%;
+  top: 12%;
   z-index: 2;
   width: 100%;
   padding-left: 20px;
