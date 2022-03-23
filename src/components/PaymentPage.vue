@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="search-box">
+    <div id="search-box" class="g-animi">
       <v-autocomplete
         v-model="search_location"
         readonly
@@ -12,7 +12,7 @@
         color="deep-purple accent-3"
       ></v-autocomplete>
     </div>
-    <div id="container">
+    <div id="container" class="g-animi">
       <v-card elevation="10" class="pt-10 pl-5 pr-5">
         <div class="hz-align">
           <div>
@@ -69,11 +69,11 @@
       </v-card>
     </div>
 
-    <div id="container-bottom">
+    <div id="container-bottom" class="g-animi">
       <v-btn
         id="book-btn"
         @click="makePayment"
-        class="mb-12"
+        class="mb-10"
         large
         dark
         color="deep-purple accent-3"
@@ -123,6 +123,7 @@
 </template>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+import gsap from "gsap";
 export default {
   data() {
     return {
@@ -188,6 +189,13 @@ export default {
     },
   },
   mounted() {
+    gsap.from(".g-animi", {
+      opacity: 0,
+      x: -50,
+      duration: 0.5,
+      stagger: 0.2,
+    });
+
     this.$store.commit("setPaymentID", null);
   },
 };
@@ -199,7 +207,7 @@ p {
 }
 #search-box {
   position: absolute;
-  top: 10%;
+  top: 40px;
   z-index: 2;
   width: 100%;
   padding-left: 20px;
@@ -207,7 +215,7 @@ p {
 }
 #container {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -216,7 +224,7 @@ p {
   width: 100%;
 }
 #container-bottom {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   margin: 0 auto;
   width: 100%;

@@ -3,7 +3,7 @@
     <div id="container">
       <img src="../assets/logo.svg" />
       <br />
-      <p class="mt-7">
+      <p class="mt-4">
         {{ currentSlide === 0 ? "Enter your details" : "Enter your password" }}
       </p>
     </div>
@@ -223,7 +223,7 @@ p {
   height: 120px;
   width: 100%;
   display: block;
-  margin: 90px auto;
+  margin: 40px auto;
   text-align: center;
 }
 #container-bottom {

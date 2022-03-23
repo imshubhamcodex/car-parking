@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="search-box">
+    <div id="search-box" class="g-animi">
       <v-autocomplete
         v-model="search_location"
         readonly
@@ -12,11 +12,11 @@
         color="deep-purple accent-3"
       ></v-autocomplete>
     </div>
-    <div id="qrcode-div">
+    <div id="qrcode-div" class="g-animi">
       <canvas id="qrcode"></canvas>
       <p id="pay-id" class="mt-3">PAYMENT ID: {{ razorpay_payment_id }}</p>
     </div>
-    <div id="container">
+    <div id="container" class="g-animi">
       <v-card elevation="10" class="pt-3 pl-5 pr-5">
         <p class="font-weight-bold">BOOKING DETAILS</p>
         <div class="hz-align">
@@ -65,10 +65,10 @@
       </v-card>
     </div>
 
-    <div id="container-bottom">
+    <div id="container-bottom" class="g-animi">
       <v-btn
         id="book-btn"
-        class="mb-12"
+        class="mb-6"
         large
         dark
         color="deep-purple accent-3"
@@ -81,6 +81,7 @@
 </template>
 
 <script>
+import gsap from "gsap";
 import QRious from "qrious";
 export default {
   data() {
@@ -107,6 +108,13 @@ export default {
     },
   },
   mounted() {
+    gsap.from(".g-animi", {
+      opacity: 0,
+      x: -50,
+      duration: 0.5,
+      stagger: 0.2,
+    });
+
     let booking_details = this.$store.state.booking_details;
     this.no_of_slots = booking_details.no_of_slots;
     this.no_of_hours = booking_details.no_of_hours;
@@ -129,14 +137,14 @@ p {
   height: 150px;
   width: 100%;
   position: absolute;
-  top: 32%;
+  top: 25%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
 }
 #search-box {
   position: absolute;
-  top: 10%;
+  top: 20px;
   z-index: 2;
   width: 100%;
   padding-left: 20px;
@@ -144,7 +152,7 @@ p {
 }
 #container {
   position: absolute;
-  top: 65%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -153,7 +161,7 @@ p {
   width: 100%;
 }
 #container-bottom {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   margin: 0 auto;
   width: 100%;
@@ -174,10 +182,13 @@ p {
   flex-direction: row;
   justify-content: space-between;
 }
+#pay-id {
+  margin-top: 25px !important;
+}
 
-@media (max-width: 450px) {
+@media (max-height: 650px) {
   #pay-id {
-    margin-top: -5px !important;
+    margin-top: 0px !important;
   }
 }
 </style>

@@ -93,7 +93,7 @@
       </v-carousel>
     </template>
 
-    <div id="container-bottom" class="pl-2 pr-2">
+    <div id="container-bottom" class="pl-4 pr-4">
       <div v-if="currentSlide < 2 ? true : false" id="btn-nav">
         <v-btn
           text
@@ -101,14 +101,15 @@
           color="deep-purple accent-3"
           @click="prevSlide"
           :disabled="currentSlide <= 0 ? true : false"
+          class="mb-12"
         >
           {{ currentSlide === 0 ? "SKIP" : "BACK" }}
         </v-btn>
-        <v-btn text outlined color="deep-purple accent-3" @click="nextSlide">
+        <v-btn class="mb-12" text outlined color="deep-purple accent-3" @click="nextSlide">
           {{ currentSlide === 2 ? "FINISH" : "NEXT" }}
         </v-btn>
       </div>
-      <v-btn @click="goToLogin" v-else id="started" large dark color="deep-purple accent-3">
+      <v-btn class="mb-12" @click="goToLogin" v-else id="started" large dark color="deep-purple accent-3">
         GET STARTED
       </v-btn>
     </div>
@@ -170,7 +171,7 @@ p {
 }
 #container-bottom {
   position: absolute;
-  bottom: 50px;
+  bottom: 20px;
   margin: 0 auto;
   width: 100%;
   display: block;

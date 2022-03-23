@@ -3,7 +3,7 @@
     <div id="background-map-div">
       <img src="../assets/home-map.svg" />
     </div>
-    <div id="search-box">
+    <div id="search-box" class="g-animi1">
       <v-autocomplete
         v-model="search_location"
         :items="location_list_names"
@@ -146,6 +146,7 @@
               x-small
               outlined
               class="float-right mr-4"
+              elevation="2"
             >
               <v-icon>mdi-chevron-down</v-icon></v-btn
             >
@@ -160,7 +161,7 @@
           >
             <v-list-item-content
               @click="openFavLocation(item.name)"
-              class="fav-list-item"
+              class="fav-list-item menu-item-animi"
             >
               <div
                 class="hz-align pl-3 pr-3 pt-4"
@@ -207,6 +208,7 @@
               x-small
               outlined
               class="float-right mr-4"
+              elevation="2"
             >
               <v-icon>mdi-chevron-down</v-icon></v-btn
             >
@@ -224,7 +226,7 @@
             v-for="item in upcomimg_list"
             :key="item.payment_id + 'upcoming'"
           >
-            <v-list-item-content class="fav-list-item">
+            <v-list-item-content class="fav-list-item menu-item-animi">
               <v-rating
                 :length="item.rating"
                 readonly
@@ -287,7 +289,7 @@
             v-for="item in history_list"
             :key="item.payment_id + 'history'"
           >
-            <v-list-item-content class="fav-list-item">
+            <v-list-item-content class="fav-list-item menu-item-animi">
               <v-rating
                 :length="item.rating"
                 readonly
@@ -345,12 +347,13 @@
               x-small
               outlined
               class="float-right mr-4"
+              elevation="2"
             >
               <v-icon>mdi-chevron-down</v-icon></v-btn
             >
           </p>
         </div>
-        <div class="mt-15 pt-10" id="user-img">
+        <div class="mt-15 pt-10 menu-item-animi" id="user-img">
           <v-avatar style="zoom: 1.6">
             <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
           </v-avatar>
@@ -364,6 +367,7 @@
             v-model="name"
             :counter="20"
             outlined
+            class="menu-item-animi"
           ></v-text-field>
           <v-text-field
             label="Phone Number"
@@ -374,6 +378,7 @@
             outlined
             :counter="10"
             @keyup="validatePhone"
+            class="menu-item-animi"
           ></v-text-field>
           <v-text-field
             label="Email"
@@ -383,6 +388,7 @@
             v-model="email"
             :counter="35"
             outlined
+            class="menu-item-animi"
           ></v-text-field>
           <v-text-field
             label="Password"
@@ -392,12 +398,13 @@
             outlined
             v-model="password"
             :counter="20"
+            class="menu-item-animi"
           ></v-text-field>
         </div>
         <div id="save-btn-div">
           <v-btn
             :disabled="btnDisabled()"
-            class="mb-8 mt-4"
+            class="mb-8 mt-4 menu-item-animi"
             large
             :dark="!btnDisabled()"
             color="deep-purple accent-3"
@@ -419,6 +426,7 @@
               x-small
               outlined
               class="float-right mr-4"
+              elevation="2"
             >
               <v-icon>mdi-chevron-down</v-icon></v-btn
             >
@@ -427,7 +435,7 @@
 
         <div class="mt-15 pt-5">
           <template>
-            <v-card class="mx-auto" max-width="344">
+            <v-card class="mx-auto menu-item-animi" max-width="344">
               <v-card-title> Terms And Conditions </v-card-title>
 
               <v-card-subtitle>
@@ -458,7 +466,7 @@
           </template>
 
           <template>
-            <v-card class="mx-auto mt-5" max-width="344">
+            <v-card class="mx-auto mt-5 menu-item-animi" max-width="344">
               <v-card-title> Privacy Policy </v-card-title>
 
               <v-card-subtitle>
@@ -488,7 +496,7 @@
             </v-card>
           </template>
         </div>
-        <div id="logout-btn-div">
+        <div id="logout-btn-div" class="menu-item-animi">
           <v-btn
             @click="goToLogin"
             class="mb-3"
@@ -506,6 +514,7 @@
 </template>
 
 <script>
+import gsap from "gsap";
 export default {
   data() {
     return {
@@ -544,6 +553,7 @@ export default {
       showProfile: false,
       showSettings: false,
       showMenu: false,
+      openItem: "",
     };
   },
   methods: {
@@ -587,6 +597,8 @@ export default {
     },
     openMenu(item) {
       this.showMenu = true;
+      this.openItem = item;
+
       if (item === "favorite") {
         this.showFavorite = true;
         this.showHistory = false;
@@ -610,11 +622,29 @@ export default {
       }
     },
     closeMenu() {
-      this.showMenu = false;
-      this.showSettings = false;
-      this.showFavorite = false;
-      this.showHistory = false;
-      this.showProfile = false;
+      gsap.fromTo(
+        "#menu-div",
+        {
+          duration: 1,
+          y: "0",
+          ease: "power3.out",
+          opacity: 1,
+        },
+        {
+          duration: 1,
+          y: "100%",
+          opacity: 0,
+          ease: "power3.out",
+        }
+      );
+      setTimeout(() => {
+        this.showMenu = false;
+        this.showMenu = false;
+        this.showSettings = false;
+        this.showFavorite = false;
+        this.showHistory = false;
+        this.showProfile = false;
+      }, 500);
     },
     removeFromFav(name) {
       const index = this.favorite_list.findIndex((item) => item.name === name);
@@ -634,6 +664,18 @@ export default {
     },
   },
   mounted() {
+    gsap.from("#search-box", {
+      duration: 1,
+      y: "-60",
+      ease: "power3.out",
+    });
+
+    gsap.from(".middle-div", {
+      duration: 0.6,
+      y: "40",
+      ease: "power3.out",
+    });
+
     this.location_list = this.$store.state.location_list;
     this.favorite_list = this.$store.state.favorite_list;
     this.history_list = this.$store.state.history_list;
@@ -651,16 +693,69 @@ export default {
     this.$store.commit("lockLocation", null);
     this.$store.commit("setBookingsDetails", null);
   },
+  watch: {
+    showMenu: function () {
+      if (this.showMenu) {
+        setTimeout(() => {
+          gsap.fromTo(
+            ".menu-item-animi",
+            {
+              duration: 0.6,
+              opacity: 0,
+              y: "50",
+              ease: "power3.out",
+              stagger: 0.2,
+            },
+
+            {
+              duration: 0.6,
+              opacity: 1,
+              y: "0",
+              ease: "power3.out",
+              stagger: 0.2,
+            }
+          );
+        }, 10);
+      }
+    },
+    openItem: function () {
+      if (this.showMenu) {
+        setTimeout(() => {
+          gsap.fromTo(
+            ".menu-item-animi",
+            {
+              duration: 0.6,
+              opacity: 0,
+              y: "50",
+              ease: "power3.out",
+              stagger: 0.2,
+            },
+
+            {
+              duration: 0.6,
+              opacity: 1,
+              y: "0",
+              ease: "power3.out",
+              stagger: 0.2,
+            }
+          );
+        }, 10);
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
+.menu-item-animi {
+  opacity: 0;
+}
 p {
   font-family: "Roboto";
 }
 #menu-div {
   position: absolute;
-  height: 93vh;
+  height: 92.8vh;
   width: 100%;
   z-index: 99;
   background: rgb(236, 236, 236);
@@ -726,19 +821,18 @@ p {
 #background-map-div > img {
   margin: 0 auto;
   width: 100%;
-
   display: block;
 }
 #search-box {
   position: absolute;
-  top: 12%;
+  top: 40px;
   z-index: 2;
   width: 100%;
   padding-left: 20px;
   padding-right: 20px;
 }
 #container-bottom {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   margin: 0 auto;
   width: 100%;
@@ -747,7 +841,7 @@ p {
 }
 .middle-div {
   position: absolute;
-  bottom: 100px;
+  bottom: 150px;
   margin: 0 auto;
   width: 100%;
   display: block;
@@ -765,10 +859,10 @@ p {
   padding: 20px;
 }
 #selected-div {
-  bottom: 150px;
+  bottom: 190px;
 }
 #book-btn-div {
-  bottom: 95px;
+  bottom: 130px;
 }
 
 #book-btn {
@@ -778,5 +872,11 @@ p {
 .hz-align {
   display: flex;
   flex-direction: row;
+}
+
+@media (max-height: 650px) {
+  #menu-div {
+    height: 91.5vh;
+  }
 }
 </style>

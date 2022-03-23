@@ -1,8 +1,7 @@
 <template>
   <div>
     <div id="container">
-      <img src="../assets/logo.svg" />
-      <br />
+      <img class="g-animi" src="../assets/logo.svg" />
       <div id="text-div">
         <v-text-field
           label="Phone Number"
@@ -12,9 +11,10 @@
           :counter="10"
           @keyup="phoneNumberChange"
           v-model="phone"
+          class="g-animi"
         ></v-text-field>
         <v-text-field
-          class="mt-3"
+          class="mt-3 g-animi"
           label="Password"
           append-icon="mdi-lock-outline"
           color="deep-purple accent-3"
@@ -23,7 +23,7 @@
           :counter="20"
         ></v-text-field>
 
-        <p>Forgot Password ?</p>
+        <p class="g-animi">Forgot Password ?</p>
       </div>
     </div>
 
@@ -37,7 +37,7 @@
             ? true
             : false
         "
-        class="btns mb-7"
+        class="btns mb-9 g-animi-btn"
         large
         :dark="
           this.phone.trim() === '' ||
@@ -55,7 +55,7 @@
       <v-btn
         outlined
         text
-        class="btns mb-15"
+        class="btns mb-15 g-animi-btn"
         large
         color="deep-purple accent-3"
         @click="goToSignup"
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import gsap from "gsap";
 export default {
   data() {
     return {
@@ -101,11 +102,27 @@ export default {
         window.innerHeight +
         "px, width=device-width, initial-scale=1.0"
     );
+
+    gsap.from(".g-animi", {
+      duration: 0.7,
+      opacity: 0,
+      y: -20,
+      ease: "back.out",
+      stagger: 0.2,
+    });
+    gsap.to(".g-animi-btn", {
+      duration: 1,
+      opacity: 1,
+      stagger: 0.1,
+    });
   },
 };
 </script>
 
 <style scoped>
+.g-animi-btn {
+  opacity: 0;
+}
 p {
   font-family: "Roboto";
   float: right;
@@ -115,8 +132,7 @@ p {
   width: 95%;
 }
 #text-div {
-  margin-top: 20px;
-  padding-top: 80px;
+  padding-top: 40px;
   width: 85%;
   display: block;
   margin-left: auto;
@@ -124,7 +140,7 @@ p {
 }
 #container {
   position: absolute;
-  top: 40%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -139,5 +155,6 @@ p {
   width: 100%;
   display: block;
   text-align: center;
+  padding-bottom: 50px;
 }
 </style>

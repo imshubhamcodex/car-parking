@@ -18,4 +18,8 @@
 body {
   overflow-y: hidden;
 }
+html,
+body {
+  height: 100%;
+}
 </style>
