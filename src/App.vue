@@ -21,5 +21,6 @@ body {
 html,
 body {
   height: 100%;
+  overscroll-behavior: contain;
 }
 </style>

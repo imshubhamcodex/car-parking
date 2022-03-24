@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div id="background-map-div">
+      <img src="../assets/secure.svg" />
+    </div>
     <div id="search-box" class="g-animi">
       <v-autocomplete
         v-model="search_location"
@@ -128,13 +131,13 @@ export default {
   data() {
     return {
       search_location: "Lekki Gardens Car Park",
-      no_of_slots: 3,
-      no_of_hours: 10,
-      check_in_time: "15:06",
-      check_in_date: "2020-06-01",
+      no_of_slots: 0,
+      no_of_hours: 0,
+      check_in_time: "",
+      check_in_date: "",
       spot_booked: false,
       dialog: false,
-      amount: 100,
+      amount: 0,
       razorpay_payment_id: null,
     };
   },
@@ -197,6 +200,18 @@ export default {
     });
 
     this.$store.commit("setPaymentID", null);
+
+    let location_list = this.$store.state.location_list;
+    this.search_location = this.$store.state.booking_details.location;
+    let fee_per_hour =
+      location_list[
+        location_list.findIndex((item) => item.name === this.search_location)
+      ].fee_per_hour;
+    this.no_of_slots = this.$store.state.booking_details.no_of_slots;
+    this.amount = this.$store.state.booking_details.no_of_hours * fee_per_hour;
+    this.check_in_time = this.$store.state.booking_details.check_in_time;
+    this.check_in_date = this.$store.state.booking_details.check_in_date;
+    this.no_of_hours = this.$store.state.booking_details.no_of_hours;
   },
 };
 </script>
@@ -204,6 +219,18 @@ export default {
 <style scoped>
 p {
   font-family: "Roboto";
+}
+#background-map-div {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+#background-map-div > img {
+  margin: 100% auto;
+  width: 100%;
+  display: block;
+  bottom: 0;
 }
 #search-box {
   position: absolute;

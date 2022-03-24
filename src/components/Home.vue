@@ -19,16 +19,27 @@
       class="middle-div"
       id="selected-div"
     >
+      <v-btn
+        fab
+        x-small
+        outlined
+        text
+        class="mt-1 mr-1"
+        @click="toggleInFavList"
+        style="float: right"
+      >
+        <v-icon :color="changeColor() ? 'yellow' : 'grey'"> mdi-star</v-icon>
+      </v-btn>
       <div>
         <p class="text-h6 mb-1">{{ search_location }}</p>
         <v-divider />
         <div
-          class="hz-align pl-3 pr-3 pt-4"
+          class="hz-align pl-3 pr-3 pt-3"
           style="justify-content: space-between"
         >
-          <div><p class="text-overline">Spaces Available:</p></div>
+          <div><p class="text-overline mb-0">Space Available:</p></div>
           <div>
-            <p class="text-overline font-weight-bold">
+            <p class="text-overline font-weight-bold mb-0">
               {{
                 location_list[
                   location_list.findIndex(
@@ -37,6 +48,21 @@
                 ].spot_avail
               }}
               slots
+            </p>
+          </div>
+        </div>
+        <div class="hz-align pl-3 pr-3" style="justify-content: space-between">
+          <div><p class="text-overline mb-0">Fee per Hour:</p></div>
+          <div>
+            <p class="text-overline font-weight-bold mb-0">
+              ₹
+              {{
+                location_list[
+                  location_list.findIndex(
+                    (item) => item.name === search_location
+                  )
+                ].fee_per_hour
+              }}
             </p>
           </div>
         </div>
@@ -155,37 +181,83 @@
 
         <v-list class="pl-2 pr-2 mt-15" style="background: transparent">
           <v-list-item
-            class="mb-4 pl-2 pr-2"
+            class="mb-4 pl-1 pr-2"
             v-for="item in favorite_list"
-            :key="item.name"
+            :key="item.location_id + 'fav'"
           >
+            <v-btn
+              fab
+              x-small
+              outlined
+              text
+              class="mt-1 mr-1 menu-item-animi"
+              @click="removeFromFav(item.name)"
+              style="position: absolute; top: 5px; right: 10px; z-index: 99"
+            >
+              <v-icon color="orange"> mdi-star</v-icon>
+            </v-btn>
             <v-list-item-content
-              @click="openFavLocation(item.name)"
+              @click="openLocation(item.location_id)"
               class="fav-list-item menu-item-animi"
             >
-              <div
-                class="hz-align pl-3 pr-3 pt-4"
-                style="justify-content: space-between"
-              >
-                <div>
-                  <p class="text-h6">{{ item.name }}</p>
+              <div>
+                <p class="text-h6 mb-1 ml-2">{{ item.name }}</p>
+                <v-divider />
+                <div
+                  class="hz-align pl-3 pr-3 pt-3"
+                  style="justify-content: space-between"
+                >
+                  <div><p class="text-overline mb-0">Space Available:</p></div>
+                  <div>
+                    <p class="text-overline font-weight-bold mb-0">
+                      {{
+                        location_list[
+                          location_list.findIndex(
+                            (obj) => obj.name === item.name
+                          )
+                        ].spot_avail
+                      }}
+                      slots
+                    </p>
+                  </div>
                 </div>
-                <div @click="removeFromFav(item.name)">
-                  <v-icon class="mt-1" color="orange">mdi-star</v-icon>
+                <div
+                  class="hz-align pl-3 pr-3"
+                  style="justify-content: space-between"
+                >
+                  <div><p class="text-overline mb-0">Fee per Hour:</p></div>
+                  <div>
+                    <p class="text-overline font-weight-bold mb-0">
+                      ₹
+                      {{
+                        location_list[
+                          location_list.findIndex(
+                            (obj) => obj.name === item.name
+                          )
+                        ].fee_per_hour
+                      }}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div
-                class="hz-align pl-3 pr-5"
-                style="justify-content: space-between"
-              >
-                <div><p class="font-weight-bold mt-2">Ratings:</p></div>
-                <div>
-                  <v-rating
-                    length="5"
-                    readonly
-                    size="20"
-                    :value="item.rating"
-                  ></v-rating>
+                <div
+                  class="hz-align pl-3 pr-3"
+                  style="justify-content: space-between"
+                >
+                  <div><p class="text-overline">Ratings:</p></div>
+                  <div>
+                    <v-rating
+                      length="5"
+                      readonly
+                      size="15"
+                      :value="
+                        location_list[
+                          location_list.findIndex(
+                            (obj) => obj.name === item.name
+                          )
+                        ].rating
+                      "
+                    ></v-rating>
+                  </div>
                 </div>
               </div>
             </v-list-item-content>
@@ -288,6 +360,7 @@
             class="mb-4 pl-2 pr-2"
             v-for="item in history_list"
             :key="item.payment_id + 'history'"
+            @click="openLocation(item.location_id)"
           >
             <v-list-item-content class="fav-list-item menu-item-animi">
               <v-rating
@@ -560,6 +633,36 @@ export default {
     goToLogin() {
       this.$router.push("/login");
     },
+    changeColor() {
+      for (let i = 0; i < this.favorite_list.length; i++) {
+        if (this.favorite_list[i].name == this.search_location) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+
+    toggleInFavList() {
+      for (let i = 0; i < this.favorite_list.length; i++) {
+        if (this.favorite_list[i].name == this.search_location) {
+          this.favorite_list.splice(i, 1);
+          return;
+        }
+      }
+
+      this.favorite_list.unshift({
+        name: this.search_location,
+        rating:
+          this.location_list[
+            this.location_list.findIndex(
+              (item) => item.name === this.search_location
+            )
+          ].rating,
+      });
+
+      this.$store.commit("setFavList", this.favorite_list);
+    },
     openBookingDetails(id) {
       const findIndex = this.upcomimg_list.findIndex(
         (item) => item.payment_id === id
@@ -567,10 +670,12 @@ export default {
       this.$store.commit("setBookingsDetails", this.upcomimg_list[findIndex]);
       this.$router.push("/booking-details");
     },
-    openFavLocation(name) {
-      const index = this.favorite_list.findIndex((item) => item.name === name);
+    openLocation(location_id) {
+      const index = this.location_list.findIndex(
+        (item) => item.location_id === location_id
+      );
       if (index >= 0) {
-        this.search_location = this.favorite_list[index].name;
+        this.search_location = this.location_list[index].name;
         this.closeMenu();
       }
     },
@@ -674,6 +779,14 @@ export default {
       duration: 0.6,
       y: "40",
       ease: "power3.out",
+    });
+
+    window.addEventListener("keyup", () => {
+      if (
+        this.search_location.trim() !== "" &&
+        this.search_location !== undefined
+      )
+        this.lockLocation();
     });
 
     this.location_list = this.$store.state.location_list;

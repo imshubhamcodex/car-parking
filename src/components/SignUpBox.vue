@@ -122,12 +122,12 @@
               </div>
             </v-card-text>
             <v-card-actions>
-              <v-spacer></v-spacer>
               <v-btn
                 @click="goToLogin"
                 color="deep-purple accent-3"
                 text
-                outlined
+                dark
+                style="display: block; margin: 0 auto"
               >
                 login
               </v-btn>

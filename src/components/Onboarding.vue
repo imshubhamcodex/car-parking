@@ -105,11 +105,25 @@
         >
           {{ currentSlide === 0 ? "SKIP" : "BACK" }}
         </v-btn>
-        <v-btn class="mb-12" text outlined color="deep-purple accent-3" @click="nextSlide">
+        <v-btn
+          class="mb-12"
+          text
+          outlined
+          color="deep-purple accent-3"
+          @click="nextSlide"
+        >
           {{ currentSlide === 2 ? "FINISH" : "NEXT" }}
         </v-btn>
       </div>
-      <v-btn class="mb-12" @click="goToLogin" v-else id="started" large dark color="deep-purple accent-3">
+      <v-btn
+        class="mb-12"
+        @click="goToLogin"
+        v-else
+        id="started"
+        large
+        dark
+        color="deep-purple accent-3"
+      >
         GET STARTED
       </v-btn>
     </div>

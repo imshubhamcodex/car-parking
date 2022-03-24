@@ -23,7 +23,7 @@
           :counter="20"
         ></v-text-field>
 
-        <p class="g-animi">Forgot Password ?</p>
+        <p class="g-animi mt-3">Forgot Password ?</p>
       </div>
     </div>
 
@@ -49,6 +49,7 @@
         "
         color="deep-purple accent-3"
         @click="goForAuth"
+        @keyup.enter="goForAuth"
       >
         LOGIN
       </v-btn>
@@ -106,15 +107,26 @@ export default {
     gsap.from(".g-animi", {
       duration: 0.7,
       opacity: 0,
-      y: -20,
+      x: -20,
       ease: "back.out",
       stagger: 0.2,
     });
-    gsap.to(".g-animi-btn", {
-      duration: 1,
-      opacity: 1,
-      stagger: 0.1,
-    });
+    gsap.fromTo(
+      ".g-animi-btn",
+      {
+        duration: 1,
+        opacity: 0,
+        x: -20,
+        stagger: 0.1,
+      },
+
+      {
+        duration: 1,
+        opacity: 1,
+        x: 0,
+        stagger: 0.1,
+      }
+    );
   },
 };
 </script>

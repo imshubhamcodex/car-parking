@@ -1,5 +1,8 @@
 <template>
   <div>
+  <div id="background-map-div">
+      <img src="../assets/man-payment.svg" />
+    </div>
     <div id="search-box" class="g-animi">
       <v-autocomplete
         v-model="search_location"
@@ -131,6 +134,17 @@ export default {
 <style scoped>
 p {
   font-family: "Roboto";
+}
+#background-map-div {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+#background-map-div > img {
+  margin: 100% auto;
+  width: 100%;
+  display: block;
 }
 #qrcode-div {
   z-index: 5;

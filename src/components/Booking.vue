@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div id="background-map-div">
+      <img src="../assets/car-girl.svg" />
+    </div>
     <div id="search-box" class="g-animi">
       <v-autocomplete
         v-model="search_location"
@@ -13,26 +16,31 @@
       ></v-autocomplete>
     </div>
     <div id="container" class="g-animi">
-      <v-card elevation="10" class="pt-10 pl-5 pr-5">
+      <v-card elevation="10" class="pt-5 pl-5 pr-5">
         <div class="hz-align">
           <div>
-            <p class="font-weight-bold">Number of Slots</p>
+            <p class="font-weight-bold">Check-in Time:</p>
           </div>
           <div>
-            <p class="font-weight-bold">{{ no_of_slots }} (Slots)</p>
+            <v-btn fab x-small class="font-weight-bold" @click="openTimeDialog">
+              <v-icon>mdi-clock-edit-outline </v-icon>
+            </v-btn>
+            {{ check_in_time }}
           </div>
         </div>
-        <div>
-          <v-slider
-            v-model="no_of_slots"
-            step="1"
-            ticks="always"
-            tick-size="4"
-            :max="maxBookingSlots"
-            color="deep-purple accent-3"
-          ></v-slider>
+
+        <div class="hz-align mt-3">
+          <div>
+            <p class="font-weight-bold">Check-in Date:</p>
+          </div>
+          <div>
+            <v-btn fab x-small class="font-weight-bold" @click="openDateDialog">
+              <v-icon>mdi-calendar-edit </v-icon>
+            </v-btn>
+            {{ check_in_date }}
+          </div>
         </div>
-        <div class="hz-align">
+        <div class="hz-align mt-2">
           <div>
             <p class="font-weight-bold">Estimate Duration</p>
           </div>
@@ -45,33 +53,23 @@
             v-model="no_of_hours"
             step="1"
             ticks="always"
-            tick-size="4"
-            :max="24"
+            tick-size="1"
+            :max="96"
             color="deep-purple accent-3"
           ></v-slider>
         </div>
-        <div class="hz-align">
-          <div>
-            <p class="font-weight-bold">Check-in Time:</p>
-          </div>
-          <div>
-            <p class="font-weight-bold" @click="openTimeDialog">
-              <v-icon class="mb-1">mdi-clock-edit-outline </v-icon>
-              {{ check_in_time }}
-            </p>
-          </div>
-        </div>
+        <div class="mt-n2 pb-1">
+          <v-divider></v-divider>
 
-        <div class="hz-align">
-          <div>
-            <p class="font-weight-bold">Check-in Date:</p>
-          </div>
-          <div>
-            <p class="font-weight-bold" @click="openDateDialog">
-              <v-icon class="mb-1">mdi-calendar-edit </v-icon>
-              {{ check_in_date }}
-            </p>
-          </div>
+          <p class="mt-4 font-weight-bold">
+            <span class="mr-1"
+              ><v-icon class="mt-n1" :color="booking_allowed ? 'green' : 'red'"
+                >mdi-check-decagram</v-icon
+              ></span
+            >
+            Booking
+            {{ booking_allowed ? "Allowed" : "Not Allowed" }}
+          </p>
         </div>
       </v-card>
     </div>
@@ -109,6 +107,11 @@
                 v-model="check_in_date"
                 show-adjacent-months
                 :min="new Date().toISOString().substr(0, 10)"
+                :max="
+                  new Date(new Date().getTime() + 345600000)
+                    .toISOString()
+                    .substr(0, 10)
+                "
               ></v-date-picker>
             </v-card-text>
             <v-card-actions>
@@ -131,13 +134,14 @@ export default {
     return {
       search_location: "",
       maxBookingSlots: 0,
-      no_of_slots: 0,
+      no_of_slots: 1,
       no_of_hours: 0,
       check_in_time: "",
       check_in_date: "",
       showTime: false,
       showDate: false,
       dialog: false,
+      booking_allowed: true,
     };
   },
   methods: {
@@ -196,6 +200,17 @@ export default {
 <style scoped>
 p {
   font-family: "Roboto";
+}
+#background-map-div {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+#background-map-div > img {
+  margin: 100% auto;
+  width: 100%;
+  display: block;
 }
 #search-box {
   position: absolute;
