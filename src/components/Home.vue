@@ -588,6 +588,7 @@
 
 <script>
 import gsap from "gsap";
+import firebase from "firebase";
 export default {
   data() {
     return {
@@ -631,7 +632,17 @@ export default {
   },
   methods: {
     goToLogin() {
-      this.$router.push("/login");
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          this.$router.push("/login");
+          this.$store.commit("setUser", null);
+        })
+        .catch((error) => {
+          console.log(error.code, error.message);
+          alert("Error while logging out");
+        });
     },
     changeColor() {
       for (let i = 0; i < this.favorite_list.length; i++) {
@@ -644,24 +655,23 @@ export default {
     },
 
     toggleInFavList() {
-      for (let i = 0; i < this.favorite_list.length; i++) {
-        if (this.favorite_list[i].name == this.search_location) {
-          this.favorite_list.splice(i, 1);
-          return;
-        }
-      }
-
-      this.favorite_list.unshift({
-        name: this.search_location,
-        rating:
+      const index = this.favorite_list.findIndex(
+        (item) => item.name === this.search_location
+      );
+      if (index > -1) {
+        this.removeFromFav(this.search_location);
+      } else {
+        this.favorite_list.unshift(
           this.location_list[
             this.location_list.findIndex(
               (item) => item.name === this.search_location
             )
-          ].rating,
-      });
+          ]
+        );
 
-      this.$store.commit("setFavList", this.favorite_list);
+        this.$store.commit("setFavList", this.favorite_list);
+        this.updateFavListInDB();
+      }
     },
     openBookingDetails(id) {
       const findIndex = this.upcomimg_list.findIndex(
@@ -755,6 +765,7 @@ export default {
       const index = this.favorite_list.findIndex((item) => item.name === name);
       this.favorite_list.splice(index, 1);
       this.$store.commit("setFavList", this.favorite_list);
+      this.updateFavListInDB();
     },
     lockLocation() {
       const lockedLocation =
@@ -767,8 +778,55 @@ export default {
 
       this.$router.push("/booking");
     },
+    // DB operations
+    async updateFavListInDB() {
+      await firebase
+        .firestore()
+        .collection("favorite_list")
+        .doc(this.$store.state.user.user_id)
+        .set(
+          {
+            list: this.favorite_list,
+          },
+          { merge: true }
+        );
+    },
   },
-  mounted() {
+  async mounted() {
+    if (this.$store.state.user === null) {
+      this.$router.push("/login");
+      return;
+    }
+
+    await firebase
+      .firestore()
+      .collection("location_list")
+      .get()
+      .then((res) => {
+        this.$store.commit("setLocationList", res.docs[0].data().list);
+      });
+
+    await firebase
+      .firestore()
+      .collection("favorite_list")
+      .doc(this.$store.state.user.user_id)
+      .get()
+      .then((res) => {
+        this.$store.commit("setFavList", res.data().list);
+      });
+
+    await firebase
+      .firestore()
+      .collection("upcoming_list")
+      .doc(this.$store.state.user.user_id)
+      .get()
+      .then((res) => {
+        const data = res.data().list.sort(function (a, b) {
+          return new Date(b.check_in_date) - new Date(a.check_in_date);
+        });
+        this.$store.commit("setUpcomingListFromDB", data);
+      });
+
     gsap.from("#search-box", {
       duration: 1,
       y: "-60",
@@ -801,6 +859,38 @@ export default {
     this.location_list.forEach((location) => {
       this.location_list_names.push(location.name);
     });
+
+    // const location_list = [
+    //   {
+    //     name: "Lekki Gardens Car Park",
+    //     rating: 2,
+    //     spot_avail: 20,
+    //     fee_per_hour: 1,
+    //     location_id: "loc1",
+    //   },
+    //   {
+    //     name: "Josh's Ground Car Park",
+    //     rating: 5,
+    //     spot_avail: 5,
+    //     fee_per_hour: 2,
+    //     location_id: "loc2",
+    //   },
+    //   {
+    //     name: "Boss Gardens Car Park",
+    //     rating: 4.5,
+    //     spot_avail: 2,
+    //     fee_per_hour: 3,
+    //     location_id: "loc3",
+    //   },
+    // ];
+
+    // // testing
+    // firebase.firestore().collection("location_list").doc("list1").set(
+    //   {
+    //     list: location_list,
+    //   },
+    //   { merge: true }
+    // );
   },
   created() {
     this.$store.commit("lockLocation", null);

@@ -4,13 +4,12 @@
       <img class="g-animi" src="../assets/logo.svg" />
       <div id="text-div">
         <v-text-field
-          label="Phone Number"
-          append-icon="mdi-cellphone-basic"
+          label="Email"
+          append-icon="mdi-email-outline"
           color="deep-purple accent-3"
-          type="number"
-          :counter="10"
-          @keyup="phoneNumberChange"
-          v-model="phone"
+          type="email"
+          :counter="35"
+          v-model="email"
           class="g-animi"
         ></v-text-field>
         <v-text-field
@@ -30,20 +29,20 @@
     <div id="container-bottom">
       <v-btn
         :disabled="
-          this.phone.trim() === '' ||
+          this.email.trim().length < 10 ||
           this.password.trim() === '' ||
-          this.phone.length < 10 ||
-          this.password.length < 6
+          this.password.length < 6 ||
+          !/^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/.test(this.email)
             ? true
             : false
         "
         class="btns mb-9 g-animi-btn"
         large
         :dark="
-          this.phone.trim() === '' ||
+          this.email.trim().length < 10 ||
           this.password.trim() === '' ||
-          this.phone.length < 10 ||
-          this.password.length < 6
+          this.password.length < 6 ||
+          !/^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/.test(this.email)
             ? false
             : true
         "
@@ -64,25 +63,63 @@
         SIGN UP
       </v-btn>
     </div>
+
+    <template>
+      <v-row justify="center">
+        <v-dialog v-model="dialog" persistent max-width="370">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn style="display: none" v-bind="attrs" v-on="on"> </v-btn>
+          </template>
+          <v-card justify="center">
+            <v-card-text>
+              <div style="text-align: center">
+                <img style="zoom: 0.3" src="../assets/load.gif" alt="" />
+                <p class="text-h5 mt-n7" style="width: 100%">Authenticating</p>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+      </v-row>
+    </template>
   </div>
 </template>
 
 <script>
 import gsap from "gsap";
+import firebase from "firebase";
 export default {
   data() {
     return {
-      phone: "",
+      email: "",
       password: "",
+      dialog: false,
     };
   },
   methods: {
     goToSignup() {
       this.$router.push("/signup");
     },
-    goForAuth() {
-      //if authenticated sucessfully
-      this.$router.push("/home");
+    async goForAuth() {
+      this.dialog = true;
+      await firebase
+        .auth()
+        .signInWithEmailAndPassword(this.email, this.password)
+        .then(async () => {
+          // Success
+          await firebase
+            .firestore()
+            .collection("user_list")
+            .where("user.email", "==", this.email)
+            .get()
+            .then((res) => {
+              this.$store.commit("setUser", res.docs[0].data().user);
+              this.$router.push("/home");
+            });
+        })
+        .catch((error) => {
+          console.log(error.code, error.message);
+          alert("Error while login into account:" + error.message);
+        });
     },
     phoneNumberChange() {
       //  /^[789]\d{9}$/

@@ -113,8 +113,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn style="display: none" v-bind="attrs" v-on="on"> </v-btn>
           </template>
-          <v-card justify="center">
-            <v-card-title class="text-h5"> </v-card-title>
+          <v-card v-if="!wait" justify="center">
             <v-card-text>
               <div style="text-align: center">
                 <img src="../assets/tick.svg" alt="" />
@@ -125,13 +124,21 @@
               <v-btn
                 @click="goToLogin"
                 color="deep-purple accent-3"
-                text
                 dark
-                style="display: block; margin: 0 auto"
+                style="display: block; margin: 10px auto; width: 100%"
               >
                 login
               </v-btn>
             </v-card-actions>
+          </v-card>
+
+          <v-card v-if="wait" justify="center">
+            <v-card-text>
+              <div style="text-align: center">
+                <img style="zoom: 0.3" src="../assets/load.gif" alt="" />
+                <p class="text-h5 mt-3">Account creating</p>
+              </div>
+            </v-card-text>
           </v-card>
         </v-dialog>
       </v-row>
@@ -140,6 +147,7 @@
 </template>
 
 <script>
+import firebase from "firebase";
 export default {
   data() {
     return {
@@ -150,6 +158,7 @@ export default {
       confirmPassword: "",
       password: "",
       dialog: false,
+      wait: true,
     };
   },
   methods: {
@@ -165,9 +174,37 @@ export default {
         this.createAccount();
       }
     },
-    createAccount() {
-      // On successfull account creation
+    async createAccount() {
       this.dialog = true;
+      await firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.email, this.password)
+        .then(async () => {
+          const user = {
+            name: this.name,
+            email: this.email,
+            phone: this.phone,
+            password: this.password,
+            user_id: firebase.auth().currentUser.uid,
+          };
+          await firebase
+            .firestore()
+            .collection("user_list")
+            .doc(firebase.auth().currentUser.uid)
+            .set(
+              {
+                user,
+              },
+              { merge: true }
+            );
+          this.$store.commit("setUser", user);
+          this.wait = false;
+        })
+        .catch((error) => {
+          this.dialog = false;
+          console.log(error.code, error.message);
+          alert("Error while creating account: " + error.message);
+        });
     },
     previousSlide() {
       if (this.currentSlide > 0) {
@@ -186,15 +223,15 @@ export default {
     btnDisabled() {
       if (this.currentSlide === 0) {
         return (
-          this.name.length < 3 ||
-          this.phone.length < 10 ||
-          this.email.length < 5 ||
+          this.name.trim().length < 3 ||
+          this.phone.trim().length < 10 ||
+          this.email.trim().length < 10 ||
           !/^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/.test(this.email)
         );
       } else if (this.currentSlide === 1) {
         return (
-          this.password.length < 6 ||
-          this.confirmPassword.length < 6 ||
+          this.password.trim().length < 6 ||
+          this.confirmPassword.trim().length < 6 ||
           this.password !== this.confirmPassword
         );
       } else {

@@ -126,6 +126,7 @@
 </template>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+import firebase from "firebase";
 import gsap from "gsap";
 export default {
   data() {
@@ -183,12 +184,25 @@ export default {
       this.$store.commit("setPaymentID", response.razorpay_payment_id);
       this.$store.commit("setPaymentAmount", this.amount);
       this.$store.commit("setUpcomingList");
+      this.updateUpcomingListInDB();
     },
     onPaymentFailure(response) {
       this.razorpay_payment_id = null;
       this.spot_booked = false;
       this.dialog = true;
       console.log(response);
+    },
+    async updateUpcomingListInDB() {
+      await firebase
+        .firestore()
+        .collection("upcoming_list")
+        .doc(this.$store.state.user.user_id)
+        .set(
+          {
+            list: this.$store.state.upcomimg_list,
+          },
+          { merge: true }
+        );
     },
   },
   mounted() {

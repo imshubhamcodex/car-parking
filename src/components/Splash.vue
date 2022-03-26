@@ -15,7 +15,7 @@
 export default {
   mounted() {
     setTimeout(() => {
-      this.$router.push("/onboarding");
+      this.$router.push("/login");
     }, 3000);
   },
 };
