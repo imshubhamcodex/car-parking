@@ -63,8 +63,12 @@
 
           <p class="mt-4 font-weight-bold">
             <span class="mr-1"
-              ><v-icon class="mt-n1" :color="booking_allowed ? 'green' : 'red'"
-                >{{booking_allowed?'mdi-check-decagram':'mdi-close-circle'}}</v-icon
+              ><v-icon
+                class="mt-n1"
+                :color="booking_allowed ? 'green' : 'red'"
+                >{{
+                  booking_allowed ? "mdi-check-decagram" : "mdi-close-circle"
+                }}</v-icon
               ></span
             >
             Booking
@@ -175,8 +179,9 @@ export default {
         check_in_time: this.check_in_time,
         check_in_date: this.check_in_date,
         location: this.search_location,
-        payment_id: null,
+        location_id: this.$store.state.locked_location.location_id,
         rating: this.$store.state.locked_location.rating,
+        payment_id: null,
       });
 
       this.$router.push("/payment");
@@ -187,7 +192,7 @@ export default {
       this.$router.push("/login");
       return;
     }
-    
+
     gsap.from(".g-animi", {
       opacity: 0,
       x: -50,

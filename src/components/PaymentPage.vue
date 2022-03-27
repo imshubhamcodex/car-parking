@@ -215,6 +215,9 @@ export default {
             },
           },
           { merge: true }
+        )
+        .catch((error) =>
+          alert("Error while updating spot status: " + error.message)
         );
     },
     async updateUpcomingListInDB() {
@@ -227,6 +230,9 @@ export default {
             list: this.$store.state.upcomimg_list,
           },
           { merge: true }
+        )
+        .catch((error) =>
+          alert("Error while updating upcoming list: " + error.message)
         );
     },
   },
@@ -235,7 +241,7 @@ export default {
       this.$router.push("/login");
       return;
     }
-    
+
     gsap.from(".g-animi", {
       opacity: 0,
       x: -50,

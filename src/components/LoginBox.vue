@@ -99,14 +99,14 @@ export default {
     goToSignup() {
       this.$router.push("/signup");
     },
-    async goForAuth() {
+    goForAuth() {
       this.dialog = true;
-      await firebase
+      firebase
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
-        .then(async () => {
+        .then(() => {
           // Success
-          await firebase
+          firebase
             .firestore()
             .collection("user_list")
             .where("user.email", "==", this.email)
@@ -114,6 +114,9 @@ export default {
             .then((res) => {
               this.$store.commit("setUser", res.docs[0].data().user);
               this.$router.push("/home");
+            })
+            .catch((error) => {
+              alert("User details NOT found: " + error.message);
             });
         })
         .catch((error) => {
@@ -123,7 +126,6 @@ export default {
         });
     },
     phoneNumberChange() {
-      //  /^[789]\d{9}$/
       if (this.phone.length > 10) {
         this.phone = this.phone.substring(0, 10);
       }

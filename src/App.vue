@@ -5,6 +5,25 @@
     </v-app>
   </div>
 </template>
+<script>
+import firebase from "firebase";
+export default {
+  async created() {
+    await firebase
+      .firestore()
+      .collection("location_list")
+      .get()
+      .then((res) => {
+        let location_list = [];
+        const list_obj = res.docs.map((doc) => doc.data());
+        list_obj.forEach((item) => {
+          location_list.push(Object.values(item)[0]);
+        });
+        this.$store.commit("setLocationList", location_list);
+      });
+  },
+};
+</script>
 
 <style>
 .v-carousel__controls__item {

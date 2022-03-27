@@ -172,9 +172,9 @@ export default {
         this.createAccount();
       }
     },
-    async createAccount() {
+    createAccount() {
       this.dialog = true;
-      await firebase
+      firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(async () => {
@@ -194,8 +194,10 @@ export default {
                 user,
               },
               { merge: true }
-            );
-          this.$store.commit("setUser", user);
+            )
+            .catch((error) => {
+              alert("Error while saving user data account: " + error.message);
+            });
           this.wait = false;
         })
         .catch((error) => {

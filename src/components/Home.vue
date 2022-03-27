@@ -298,7 +298,7 @@
           <div class="hz-align" style="justify-content: space-between">
             <p class="font-weight-bold pl-1 mt-4">Upcomimg</p>
             <p class="font-weight-bold pr-1 mt-4">
-              <v-icon style="color: #651fff">mdi-clock-time-four</v-icon>
+              <v-icon style="color: #651fff">mdi-clock-outline</v-icon>
             </p>
           </div>
           <v-list-item
@@ -306,7 +306,7 @@
             v-for="item in upcomimg_list"
             :key="item.payment_id + 'upcoming'"
           >
-            <v-list-item-content class="fav-list-item menu-item-animi">
+            <v-list-item-content class="fav-list-item menu-item-animi pb-0">
               <v-rating
                 :length="item.rating"
                 readonly
@@ -354,6 +354,69 @@
                 <div>
                   <p class="mt-2 mb-0">₹ {{ item.payment_amount }}</p>
                 </div>
+              </div>
+              <hr class="mt-2" />
+              <div class="mr-2 mt-0">
+                <v-btn dark color="red" small style="width:100%;"> cancle </v-btn>
+              </div>
+            </v-list-item-content>
+          </v-list-item>
+
+          <div class="hz-align" style="justify-content: space-between">
+            <p class="font-weight-bold pl-1 mt-4">InProgress</p>
+            <p class="font-weight-bold pr-1 mt-4" style="color: #651fff">
+              <v-icon style="color: #651fff">mdi-progress-check</v-icon>
+            </p>
+          </div>
+          <v-list-item
+            class="mb-4 pl-2 pr-2"
+            v-for="item in inprogress_list"
+            :key="item.payment_id + 'inprogress'"
+            @click="openLocation(item.location_id)"
+          >
+            <v-list-item-content class="fav-list-item menu-item-animi pb-0">
+              <v-rating
+                :length="item.rating"
+                readonly
+                :value="item.rating"
+                size="15"
+                color="yellow accent-4"
+                class="mt-n2"
+              ></v-rating>
+
+              <div
+                class="hz-align pl-3 pr-3 pt-0 mt-n2"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="text-h6">{{ item.location }}</p>
+                  <p class="mt-n4">
+                    {{ item.no_of_slots }}
+                    {{ item.no_of_slots > 1 ? "spots" : "spot" }}
+                  </p>
+                </div>
+                <div>
+                  <v-icon class="mt-1" color="green">mdi-progress-alert</v-icon>
+                </div>
+              </div>
+              <hr />
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">{{ item.check_in_date }}</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">{{ item.check_in_time }}</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">₹ {{ item.payment_amount }}</p>
+                </div>
+              </div>
+              <hr class="mt-2" />
+              <div class="mr-2 mt-0">
+                <v-btn dark color="green" small style="width:100%;"> extend </v-btn>
               </div>
             </v-list-item-content>
           </v-list-item>
@@ -604,6 +667,7 @@ export default {
       favorite_list: [],
       history_list: [],
       upcomimg_list: [],
+      inprogress_list: [],
       location_list_names: [],
       name: "",
       phone: "",
@@ -811,17 +875,35 @@ export default {
       return;
     }
 
-    await firebase
+    gsap.from("#search-box", {
+      duration: 1,
+      y: "-60",
+      ease: "power3.out",
+    });
+
+    gsap.from(".middle-div", {
+      duration: 0.6,
+      y: "40",
+      ease: "power3.out",
+    });
+
+    // DB ops START
+
+    firebase
       .firestore()
-      .collection("location_list")
+      .collection("upcoming_list")
+      .doc(this.$store.state.user.user_id)
       .get()
       .then((res) => {
-        let location_list = [];
-        const list_obj = res.docs.map((doc) => doc.data());
-        list_obj.forEach((item) => {
-          location_list.push(Object.values(item)[0]);
-        });
-        this.$store.commit("setLocationList", location_list);
+        if (res.exists) {
+          const data = res.data().list.sort(function (a, b) {
+            return new Date(b.check_in_date) - new Date(a.check_in_date);
+          });
+          this.$store.commit("setUpcomingListFromDB", data);
+        }
+      })
+      .catch((error) => {
+        alert("Error while fetching upcoming list: " + error.message);
       });
 
     await firebase
@@ -844,33 +926,12 @@ export default {
           });
           this.$store.commit("setFavList", fav_list);
         }
+      })
+      .catch((error) => {
+        alert("Error while fetching favorite list: " + error.message);
       });
 
-    await firebase
-      .firestore()
-      .collection("upcoming_list")
-      .doc(this.$store.state.user.user_id)
-      .get()
-      .then((res) => {
-        if (res.exists) {
-          const data = res.data().list.sort(function (a, b) {
-            return new Date(b.check_in_date) - new Date(a.check_in_date);
-          });
-          this.$store.commit("setUpcomingListFromDB", data);
-        }
-      });
-
-    gsap.from("#search-box", {
-      duration: 1,
-      y: "-60",
-      ease: "power3.out",
-    });
-
-    gsap.from(".middle-div", {
-      duration: 0.6,
-      y: "40",
-      ease: "power3.out",
-    });
+    // DB ops ENDS
 
     window.addEventListener("keyup", () => {
       if (
@@ -884,6 +945,7 @@ export default {
     this.favorite_list = this.$store.state.favorite_list;
     this.history_list = this.$store.state.history_list;
     this.upcomimg_list = this.$store.state.upcomimg_list;
+    this.inprogress_list = this.$store.state.inprogress_list;
     const user = this.$store.state.user;
     this.name = user.name;
     this.phone = user.phone;
