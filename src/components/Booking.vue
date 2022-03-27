@@ -64,7 +64,7 @@
           <p class="mt-4 font-weight-bold">
             <span class="mr-1"
               ><v-icon class="mt-n1" :color="booking_allowed ? 'green' : 'red'"
-                >mdi-check-decagram</v-icon
+                >{{booking_allowed?'mdi-check-decagram':'mdi-close-circle'}}</v-icon
               ></span
             >
             Booking
@@ -133,7 +133,6 @@ export default {
   data() {
     return {
       search_location: "",
-      maxBookingSlots: 0,
       no_of_slots: 1,
       no_of_hours: 0,
       check_in_time: "",
@@ -141,7 +140,7 @@ export default {
       showTime: false,
       showDate: false,
       dialog: false,
-      booking_allowed: true,
+      booking_allowed: false,
     };
   },
   methods: {
@@ -152,6 +151,9 @@ export default {
         this.check_in_time.trim() == "" ||
         this.check_in_date.trim() == ""
       ) {
+        return true;
+      }
+      if (!this.booking_allowed) {
         return true;
       }
       return false;
@@ -181,6 +183,11 @@ export default {
     },
   },
   mounted() {
+    if (this.$store.state.user === null) {
+      this.$router.push("/login");
+      return;
+    }
+    
     gsap.from(".g-animi", {
       opacity: 0,
       x: -50,
@@ -189,10 +196,8 @@ export default {
     });
 
     this.search_location = this.$store.state.locked_location.name;
-    this.maxBookingSlots =
-      this.$store.state.locked_location.spot_avail > 5
-        ? 5
-        : this.$store.state.locked_location.spot_avail;
+
+    this.booking_allowed = this.$store.state.locked_location.booking_allowed;
   },
 };
 </script>

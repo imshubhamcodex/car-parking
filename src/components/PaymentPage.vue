@@ -184,6 +184,7 @@ export default {
       this.$store.commit("setPaymentID", response.razorpay_payment_id);
       this.$store.commit("setPaymentAmount", this.amount);
       this.$store.commit("setUpcomingList");
+      this.updateSpotStatus();
       this.updateUpcomingListInDB();
     },
     onPaymentFailure(response) {
@@ -191,6 +192,30 @@ export default {
       this.spot_booked = false;
       this.dialog = true;
       console.log(response);
+    },
+    async updateSpotStatus() {
+      const location = this.$store.state.locked_location;
+      const location_id = location.location_id;
+      await firebase
+        .firestore()
+        .collection("location_list")
+        .doc(location_id)
+        .update(
+          {
+            [location_id]: {
+              name: location.name,
+              rating: location.rating,
+              spot_avail: location.spot_avail - this.no_of_slots,
+              location_id: location_id,
+              fee_per_hour: location.fee_per_hour,
+              booking_allowed:
+                location.spot_avail - this.no_of_slots <= 0
+                  ? false
+                  : location.booking_allowed,
+            },
+          },
+          { merge: true }
+        );
     },
     async updateUpcomingListInDB() {
       await firebase
@@ -206,6 +231,11 @@ export default {
     },
   },
   mounted() {
+    if (this.$store.state.user === null) {
+      this.$router.push("/login");
+      return;
+    }
+    
     gsap.from(".g-animi", {
       opacity: 0,
       x: -50,

@@ -114,22 +114,20 @@
             <v-btn style="display: none" v-bind="attrs" v-on="on"> </v-btn>
           </template>
           <v-card v-if="!wait" justify="center">
-            <v-card-text>
+            <v-card-text class="pt-4">
               <div style="text-align: center">
                 <img src="../assets/tick.svg" alt="" />
-                <p class="text-h5 mt-3">Account successfully created</p>
+                <p class="text-h5 mt-2">Account successfully created</p>
               </div>
-            </v-card-text>
-            <v-card-actions>
               <v-btn
                 @click="goToLogin"
                 color="deep-purple accent-3"
                 dark
-                style="display: block; margin: 10px auto; width: 100%"
+                style="display: block; margin: 5px auto; width: 100%"
               >
                 login
               </v-btn>
-            </v-card-actions>
+            </v-card-text>
           </v-card>
 
           <v-card v-if="wait" justify="center">

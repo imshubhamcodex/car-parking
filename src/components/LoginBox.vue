@@ -118,7 +118,8 @@ export default {
         })
         .catch((error) => {
           console.log(error.code, error.message);
-          alert("Error while login into account:" + error.message);
+          alert("Error while login into account: " + error.message);
+          this.dialog = false;
         });
     },
     phoneNumberChange() {

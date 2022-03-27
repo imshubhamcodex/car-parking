@@ -47,7 +47,15 @@
                   )
                 ].spot_avail
               }}
-              slots
+              {{
+                location_list[
+                  location_list.findIndex(
+                    (item) => item.name === search_location
+                  )
+                ].spot_avail > 1
+                  ? "Slots"
+                  : "Slot"
+              }}
             </p>
           </div>
         </div>
@@ -636,8 +644,8 @@ export default {
         .auth()
         .signOut()
         .then(() => {
-          this.$router.push("/login");
           this.$store.commit("setUser", null);
+          this.$router.push("/login");
         })
         .catch((error) => {
           console.log(error.code, error.message);
@@ -780,13 +788,18 @@ export default {
     },
     // DB operations
     async updateFavListInDB() {
+      let location_id_list = [];
+      this.favorite_list.forEach((item) => {
+        location_id_list.push(item.location_id);
+      });
+
       await firebase
         .firestore()
         .collection("favorite_list")
         .doc(this.$store.state.user.user_id)
         .set(
           {
-            list: this.favorite_list,
+            list: location_id_list,
           },
           { merge: true }
         );
@@ -803,7 +816,12 @@ export default {
       .collection("location_list")
       .get()
       .then((res) => {
-        this.$store.commit("setLocationList", res.docs[0].data().list);
+        let location_list = [];
+        const list_obj = res.docs.map((doc) => doc.data());
+        list_obj.forEach((item) => {
+          location_list.push(Object.values(item)[0]);
+        });
+        this.$store.commit("setLocationList", location_list);
       });
 
     await firebase
@@ -812,7 +830,20 @@ export default {
       .doc(this.$store.state.user.user_id)
       .get()
       .then((res) => {
-        this.$store.commit("setFavList", res.data().list);
+        if (res.exists) {
+          let fav_list = [];
+          res.data().list.forEach((item) => {
+            firebase
+              .firestore()
+              .collection("location_list")
+              .doc(item)
+              .get()
+              .then((res) => {
+                fav_list.push(res.data()[item]);
+              });
+          });
+          this.$store.commit("setFavList", fav_list);
+        }
       });
 
     await firebase
@@ -821,10 +852,12 @@ export default {
       .doc(this.$store.state.user.user_id)
       .get()
       .then((res) => {
-        const data = res.data().list.sort(function (a, b) {
-          return new Date(b.check_in_date) - new Date(a.check_in_date);
-        });
-        this.$store.commit("setUpcomingListFromDB", data);
+        if (res.exists) {
+          const data = res.data().list.sort(function (a, b) {
+            return new Date(b.check_in_date) - new Date(a.check_in_date);
+          });
+          this.$store.commit("setUpcomingListFromDB", data);
+        }
       });
 
     gsap.from("#search-box", {
@@ -867,6 +900,7 @@ export default {
     //     spot_avail: 20,
     //     fee_per_hour: 1,
     //     location_id: "loc1",
+    //     booking_allowed: true,
     //   },
     //   {
     //     name: "Josh's Ground Car Park",
@@ -874,6 +908,7 @@ export default {
     //     spot_avail: 5,
     //     fee_per_hour: 2,
     //     location_id: "loc2",
+    //     booking_allowed: true,
     //   },
     //   {
     //     name: "Boss Gardens Car Park",
@@ -881,16 +916,19 @@ export default {
     //     spot_avail: 2,
     //     fee_per_hour: 3,
     //     location_id: "loc3",
+    //     booking_allowed: true,
     //   },
     // ];
 
     // // testing
-    // firebase.firestore().collection("location_list").doc("list1").set(
+    // firebase.firestore().collection("location_list").doc(location_list[2].location_id).set(
     //   {
-    //     list: location_list,
+    //     [location_list[2].location_id]:location_list[2],
     //   },
     //   { merge: true }
     // );
+
+    //testing
   },
   created() {
     this.$store.commit("lockLocation", null);
