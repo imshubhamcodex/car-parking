@@ -22,19 +22,7 @@ export default new Vuex.Store({
       },
     ],
     upcomimg_list: [],
-    inprogress_list: [
-      {
-        no_of_slots: 1,
-        no_of_hours: 10,
-        check_in_time: "10:00",
-        check_in_date: "2020-06-01",
-        location: "Lekki Gardens Car Park",
-        location_id: "loc1",
-        payment_id: "pay_JC7Y8rIM3pLSHJ",
-        payment_amount: 101,
-        rating: 3,
-      },
-    ],
+    inprogress_list: [],
     locked_location: {},
     booking_details: {},
   },
@@ -57,6 +45,14 @@ export default new Vuex.Store({
     setFavList(state, payload) {
       state.favorite_list = payload;
     },
+    setInProgressList(state, payload) {
+      state.inprogress_list.forEach((item, index) => {
+        if (item.payment_id == payload.payment_id) {
+          state.inprogress_list.splice(index, 1);
+        }
+      });
+      state.inprogress_list.unshift(payload);
+    },
     setUser(state, payload) {
       state.user = payload;
     },
@@ -65,6 +61,9 @@ export default new Vuex.Store({
     },
     setUpcomingListFromDB(state, payload) {
       state.upcomimg_list = payload;
+    },
+    setInProgressListFromDB(state, payload) {
+      state.inprogress_list = payload;
     },
   },
 });

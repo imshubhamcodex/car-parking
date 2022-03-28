@@ -182,6 +182,9 @@ export default {
         location_id: this.$store.state.locked_location.location_id,
         rating: this.$store.state.locked_location.rating,
         payment_id: null,
+        extended_hours: [],
+        extended_hours_payment_id:[],
+        extended_hours_payment_amount: [],
       });
 
       this.$router.push("/payment");

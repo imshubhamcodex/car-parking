@@ -1,6 +1,6 @@
 <template>
   <div>
-  <div id="background-map-div">
+    <div id="background-map-div">
       <img src="../assets/man-payment.svg" />
     </div>
     <div id="search-box" class="g-animi">
@@ -95,6 +95,9 @@ export default {
       check_in_time: "00:00",
       check_in_date: "0000-00-00",
       razorpay_payment_id: null,
+      extended_hours: [],
+      extended_hours_payment_id: [],
+      extended_hours_payment_amount: [],
     };
   },
   methods: {
@@ -104,10 +107,27 @@ export default {
     generateQR() {
       new QRious({
         element: document.getElementById("qrcode"),
-        value: this.razorpay_payment_id,
+        value: this.getValue(),
         level: "H",
         size: 140,
       });
+    },
+    getValue() {
+      if (this.$store.state.booking_details.extended_hours.length === 0) {
+        return this.razorpay_payment_id;
+      } else {
+        let newValue = "";
+        for (let i = 0; i < this.extended_hours.length; i++) {
+          newValue +=
+            this.extended_hours_payment_id[i] +
+            "-" +
+            this.extended_hours_payment_amount[i] +
+            "-" +
+            this.extended_hours[i] +
+            "/";
+        }
+        return newValue + ":" + this.razorpay_payment_id+"=Expired";
+      }
     },
   },
   mounted() {
@@ -125,6 +145,13 @@ export default {
     this.check_in_date = booking_details.check_in_date;
     this.search_location = booking_details.location;
     this.razorpay_payment_id = booking_details.payment_id;
+    if (this.$store.state.booking_details.extended_hours.length > 0) {
+      this.extended_hours = this.$store.state.booking_details.extended_hours;
+      this.extended_hours_payment_id =
+        this.$store.state.booking_details.extended_hours_payment_id;
+      this.extended_hours_payment_amount =
+        this.$store.state.booking_details.extended_hours_payment_amount;
+    }
 
     this.generateQR();
   },

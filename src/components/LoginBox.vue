@@ -135,6 +135,7 @@ export default {
     },
   },
   mounted() {
+    this.$store.commit("setUser", null);
     document.documentElement.style.setProperty("overflow", "auto");
     const metaViewport = document.querySelector("meta[name=viewport]");
     metaViewport.setAttribute(

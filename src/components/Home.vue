@@ -346,10 +346,70 @@
                 style="justify-content: space-between"
               >
                 <div>
-                  <p class="mt-2 mb-0">{{ item.check_in_date }}</p>
+                  <p class="mt-2 mb-0">Enter After:</p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">{{ item.check_in_time }}</p>
+                  <p class="mt-2 mb-0">
+                    {{ reshapeTime(item.check_in_date, item.check_in_time) }}
+                  </p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    {{ reshapeDate(item.check_in_date, item.check_in_time) }}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">Exit Before:</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    {{
+                      exitTime(
+                        item.check_in_date,
+                        item.check_in_time,
+                        item.no_of_hours
+                      )
+                    }}
+                  </p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    {{
+                      exitDate(
+                        item.check_in_date,
+                        item.check_in_time,
+                        item.no_of_hours
+                      )
+                    }}
+                  </p>
+                </div>
+              </div>
+              <hr class="mt-2" />
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">Total Duration:</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    {{ item.no_of_hours }}
+                    {{ item.no_of_hours > 1 ? " (Hrs.)" : " (Hr.)" }}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">Amount Paid:</p>
                 </div>
                 <div>
                   <p class="mt-2 mb-0">₹ {{ item.payment_amount }}</p>
@@ -357,13 +417,40 @@
               </div>
               <hr class="mt-2" />
               <div class="mr-2 mt-0">
-                <v-btn dark color="red" small style="width:100%;"> cancle </v-btn>
+                <v-btn
+                  @click="cancleUpcoming(item.location_id)"
+                  :dark="
+                    !(
+                      new Date(
+                        item.check_in_date +
+                          'T' +
+                          item.check_in_time +
+                          ':00.000+05:30'
+                      ).valueOf() <
+                      new Date().valueOf() + 1000 * 60 * 60 * 1
+                    )
+                  "
+                  color="red"
+                  small
+                  style="width: 100%"
+                  :disabled="
+                    new Date(
+                      item.check_in_date +
+                        'T' +
+                        item.check_in_time +
+                        ':00.000+05:30'
+                    ).valueOf() <
+                    new Date().valueOf() + 1000 * 60 * 60 * 1
+                  "
+                >
+                  cancle
+                </v-btn>
               </div>
             </v-list-item-content>
           </v-list-item>
 
           <div class="hz-align" style="justify-content: space-between">
-            <p class="font-weight-bold pl-1 mt-4">InProgress</p>
+            <p class="font-weight-bold pl-1 mt-4">In-Progress</p>
             <p class="font-weight-bold pr-1 mt-4" style="color: #651fff">
               <v-icon style="color: #651fff">mdi-progress-check</v-icon>
             </p>
@@ -372,7 +459,6 @@
             class="mb-4 pl-2 pr-2"
             v-for="item in inprogress_list"
             :key="item.payment_id + 'inprogress'"
-            @click="openLocation(item.location_id)"
           >
             <v-list-item-content class="fav-list-item menu-item-animi pb-0">
               <v-rating
@@ -396,7 +482,16 @@
                   </p>
                 </div>
                 <div>
-                  <v-icon class="mt-1" color="green">mdi-progress-alert</v-icon>
+                  <v-btn
+                    @click="openBookingDetailsInProgress(item.payment_id)"
+                    text
+                    fab
+                    elevation="3"
+                    small
+                    outlined
+                  >
+                    <v-icon color="">mdi-qrcode</v-icon>
+                  </v-btn>
                 </div>
               </div>
               <hr />
@@ -405,18 +500,126 @@
                 style="justify-content: space-between"
               >
                 <div>
-                  <p class="mt-2 mb-0">{{ item.check_in_date }}</p>
+                  <p class="mt-2 mb-0">Exit Before:</p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">{{ item.check_in_time }}</p>
+                  <p class="mt-2 mb-0">
+                    {{
+                      exitTime(
+                        item.check_in_date,
+                        item.check_in_time,
+                        item.no_of_hours + sumOfExtendedHours(item)
+                      )
+                    }}
+                  </p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">₹ {{ item.payment_amount }}</p>
+                  <p class="mt-2 mb-0">
+                    {{
+                      exitDate(
+                        item.check_in_date,
+                        item.check_in_time,
+                        item.no_of_hours + sumOfExtendedHours(item)
+                      )
+                    }}
+                  </p>
                 </div>
               </div>
               <hr class="mt-2" />
-              <div class="mr-2 mt-0">
-                <v-btn dark color="green" small style="width:100%;"> extend </v-btn>
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">Total Duration:</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    {{ item.no_of_hours + sumOfExtendedHours(item) }}
+                    {{
+                      item.no_of_hours + sumOfExtendedHours(item) > 1
+                        ? " (Hrs.)"
+                        : " (Hr.)"
+                    }}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">Amount Paid:</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    ₹
+                    {{
+                      item.payment_amount + sumOfAmountForExtendedHours(item)
+                    }}
+                  </p>
+                </div>
+              </div>
+              <hr class="mt-2" />
+              <div v-if="!showExtendHourDiv" class="mr-2 mt-0">
+                <v-btn
+                  @click="showExtendHourDiv = !showExtendHourDiv"
+                  dark
+                  color="green"
+                  small
+                  style="width: 100%"
+                  :disabled="item.no_of_hours + sumOfExtendedHours(item) >= 350"
+                >
+                  extend
+                </v-btn>
+              </div>
+              <div class="mr-2 mt-4" v-else>
+                <div
+                  class="hz-align pl-3 pr-3"
+                  style="justify-content: space-between"
+                >
+                  <div>
+                    <p class="font-weight-bold">Extend hours :</p>
+                  </div>
+                  <div>
+                    <p class="font-weight-bold">{{ extend_hours }} Hrs.</p>
+                  </div>
+                </div>
+                <span v-for="(chip, i) in chips" :key="chip.value + 'chip'">
+                  <v-chip
+                    @click="extendHours(chip.value, i)"
+                    small
+                    class="ma-2"
+                    color="success"
+                    :outlined="!chip.selected"
+                  >
+                    <v-icon style="zoom: 0.7" left> mdi-clock-plus </v-icon>
+                    {{ chip.value }} Hr
+                  </v-chip>
+                </span>
+
+                <div class="mr-0 mt-3">
+                  <v-btn
+                    @click="bookExtendHours(item.location_id)"
+                    dark
+                    color="green"
+                    small
+                    style="width: 100%"
+                  >
+                    book
+                  </v-btn>
+                </div>
+                <div class="mr-0 mt-3">
+                  <v-btn
+                    @click="showExtendHourDiv = !showExtendHourDiv"
+                    dark
+                    color="red"
+                    small
+                    style="width: 100%"
+                  >
+                    close
+                  </v-btn>
+                </div>
               </div>
             </v-list-item-content>
           </v-list-item>
@@ -497,11 +700,7 @@
             >
           </p>
         </div>
-        <div class="mt-15 pt-10 menu-item-animi" id="user-img">
-          <v-avatar style="zoom: 1.6">
-            <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
-          </v-avatar>
-        </div>
+        <div class="mt-15 pt-10 menu-item-animi" id="user-img"></div>
         <div class="mt-10" id="text-div">
           <v-text-field
             label="Your Name"
@@ -669,6 +868,7 @@ export default {
       upcomimg_list: [],
       inprogress_list: [],
       location_list_names: [],
+      extend_hours: 0,
       name: "",
       phone: "",
       email: "",
@@ -691,6 +891,36 @@ export default {
           icon: "mdi-cog-outline",
         },
       ],
+      chips: [
+        {
+          value: 1,
+          selected: false,
+        },
+        {
+          value: 2,
+          selected: false,
+        },
+        {
+          value: 3,
+          selected: false,
+        },
+        {
+          value: 4,
+          selected: false,
+        },
+        {
+          value: 5,
+          selected: false,
+        },
+        {
+          value: 10,
+          selected: false,
+        },
+        {
+          value: 15,
+          selected: false,
+        },
+      ],
       search_location: "",
       showTandC: false,
       showPrivacy: false,
@@ -699,16 +929,177 @@ export default {
       showProfile: false,
       showSettings: false,
       showMenu: false,
+      showExtendHourDiv: false,
       openItem: "",
     };
   },
   methods: {
-    goToLogin() {
+    openBookingDetailsInProgress(id) {
+      const findIndex = this.inprogress_list.findIndex(
+        (item) => item.payment_id === id
+      );
+      this.$store.commit("setBookingsDetails", this.inprogress_list[findIndex]);
+      this.$router.push("/booking-details");
+    },
+    sumOfAmountForExtendedHours(item) {
+      let sum = 0;
+      for (let i = 0; i < item.extended_hours_payment_amount.length; i++) {
+        sum += item.extended_hours_payment_amount[i];
+      }
+      return sum;
+    },
+    sumOfExtendedHours(item) {
+      let sum = 0;
+      for (let i = 0; i < item.extended_hours.length; i++) {
+        sum += item.extended_hours[i];
+      }
+      return sum;
+    },
+    reshapeDate(date, time) {
+      const dateLocale = new Date(date + "T" + time + ":00.000+05:30")
+        .toLocaleDateString()
+        .split("/");
+      if (dateLocale[0].length == 1) {
+        dateLocale[0] = "0" + dateLocale[0];
+      }
+      if (dateLocale[1].length == 1) {
+        dateLocale[1] = "0" + dateLocale[1];
+      }
+
+      return dateLocale[1] + "-" + dateLocale[0] + "-" + dateLocale[2];
+    },
+    reshapeTime(date, time) {
+      let newTime = new Date(new Date(date + "T" + time + ":00.000+05:30"))
+        .toLocaleTimeString()
+        .split(":");
+      if (newTime[0].length == 1) {
+        newTime[0] = "0" + newTime[0];
+      }
+      if (newTime[1].length == 1) {
+        newTime[1] = "0" + newTime[1];
+      }
+      return (
+        newTime[0] +
+        ":" +
+        newTime[1] +
+        " " +
+        new Date(new Date(date + "T" + time + ":00.000+05:30"))
+          .toLocaleTimeString()
+          .split(" ")[1]
+      );
+    },
+    exitDate(date, time, no_of_hours) {
+      const dateLocale = new Date(
+        new Date(date + "T" + time + ":00.000+05:30").valueOf() +
+          no_of_hours * 60 * 60 * 1000
+      )
+        .toLocaleDateString()
+        .split("/");
+      if (dateLocale[0].length == 1) {
+        dateLocale[0] = "0" + dateLocale[0];
+      }
+      if (dateLocale[1].length == 1) {
+        dateLocale[1] = "0" + dateLocale[1];
+      }
+
+      return dateLocale[1] + "-" + dateLocale[0] + "-" + dateLocale[2];
+    },
+    exitTime(date, time, no_of_hours) {
+      const timeLocale = new Date(
+        new Date(date + "T" + time + ":00.000+05:30").valueOf() +
+          no_of_hours * 60 * 60 * 1000
+      )
+        .toLocaleTimeString()
+        .split(":");
+      if (timeLocale[0].length == 1) {
+        timeLocale[0] = "0" + timeLocale[0];
+      }
+      if (timeLocale[1].length == 1) {
+        timeLocale[1] = "0" + timeLocale[1];
+      }
+
+      return (
+        timeLocale[0] +
+        ":" +
+        timeLocale[1] +
+        " " +
+        new Date(
+          new Date(date + "T" + time + ":00.000+05:30").valueOf() +
+            no_of_hours * 60 * 60 * 1000
+        )
+          .toLocaleTimeString()
+          .split(" ")[1]
+      );
+    },
+
+    bookExtendHours(location_id) {
+      const fee =
+        this.location_list[
+          this.location_list.findIndex(
+            (item) => item.location_id === location_id
+          )
+        ].fee_per_hour;
+
+      const inprogress =
+        this.inprogress_list[
+          this.inprogress_list.findIndex(
+            (item) => item.location_id === location_id
+          )
+        ];
+      inprogress.extended_hours.push(this.extend_hours);
+      inprogress.extended_hours_payment_amount.push(fee * this.extend_hours),
+        this.$store.commit("setBookingsDetails", {
+          no_of_slots: inprogress.no_of_slots,
+          no_of_hours: inprogress.no_of_hours,
+          check_in_time: inprogress.check_in_time,
+          check_in_date: inprogress.check_in_date,
+          location: inprogress.location,
+          location_id: inprogress.location_id,
+          rating: inprogress.rating,
+          payment_id: inprogress.payment_id,
+          payment_amount: inprogress.payment_amount,
+          extended_hours: inprogress.extended_hours,
+          extended_hours_payment_id: inprogress.extended_hours_payment_id,
+          extended_hours_payment_amount:
+            inprogress.extended_hours_payment_amount,
+        });
+
+      // console.log(inprogress.payment_id);
+
+      this.$router.push("/payment");
+    },
+    extendHours(value, index) {
+      if (this.chips[index].selected) {
+        this.chips[index].selected = false;
+        this.extend_hours = this.extend_hours - value;
+      } else {
+        this.extend_hours += value;
+        this.chips[index].selected = true;
+      }
+    },
+    cancleUpcoming(location_id) {
+      this.upcomimg_list.forEach((item, index) => {
+        if (item.location_id == location_id) {
+          this.upcomimg_list.splice(index, 1);
+        }
+      });
+
       firebase
+        .firestore()
+        .collection("upcoming_list")
+        .doc(this.$store.state.user.user_id)
+        .update({
+          list: this.upcomimg_list,
+        });
+
+      //initiate refund
+    },
+    async goToLogin() {
+      this.$store.commit("setUser", null);
+      await firebase
         .auth()
         .signOut()
         .then(() => {
-          this.$store.commit("setUser", null);
           this.$router.push("/login");
         })
         .catch((error) => {
@@ -931,6 +1322,20 @@ export default {
         alert("Error while fetching favorite list: " + error.message);
       });
 
+    await firebase
+      .firestore()
+      .collection("inprogress_list")
+      .doc(this.$store.state.user.user_id)
+      .get()
+      .then((res) => {
+        if (res.exists) {
+          this.$store.commit("setInProgressListFromDB", res.data().list);
+        }
+      })
+      .catch((error) => {
+        alert("Error while fetching progress list: " + error.message);
+      });
+
     // DB ops ENDS
 
     window.addEventListener("keyup", () => {
@@ -940,6 +1345,8 @@ export default {
       )
         this.lockLocation();
     });
+
+    this.$store.commit("setBookingsDetails", {});
 
     this.location_list = this.$store.state.location_list;
     this.favorite_list = this.$store.state.favorite_list;
@@ -992,7 +1399,19 @@ export default {
 
     //testing
   },
-  created() {
+  async created() {
+    await firebase
+      .firestore()
+      .collection("location_list")
+      .get()
+      .then((res) => {
+        let location_list = [];
+        const list_obj = res.docs.map((doc) => doc.data());
+        list_obj.forEach((item) => {
+          location_list.push(Object.values(item)[0]);
+        });
+        this.$store.commit("setLocationList", location_list);
+      });
     this.$store.commit("lockLocation", null);
     this.$store.commit("setBookingsDetails", null);
   },

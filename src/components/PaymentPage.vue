@@ -29,17 +29,38 @@
         </div>
         <div class="hz-align">
           <div>
-            <p class="font-weight-bold">Estimated Duration</p>
+            <p class="font-weight-bold">
+              {{
+                extended_hours.length > 0
+                  ? "Extended Duration"
+                  : "Estimated Duration"
+              }}
+            </p>
           </div>
           <div>
             <p class="font-weight-bold">
-              {{ no_of_hours }} {{ no_of_hours > 1 ? "(Hrs)" : "(Hr)" }}
+              {{
+                extended_hours.length > 0
+                  ? extended_hours[extended_hours.length - 1]
+                  : no_of_hours
+              }}
+              {{
+                no_of_hours > 1 ||
+                (extended_hours.length > 0 &&
+                  extended_hours[extended_hours.length - 1] > 1)
+                  ? "(Hrs)"
+                  : "(Hr)"
+              }}
             </p>
           </div>
         </div>
         <div class="hz-align">
           <div>
-            <p class="font-weight-bold">Check-in Time:</p>
+            <p class="font-weight-bold">
+              {{
+                extended_hours.length > 0 ? "Checked-in At" : "Check-in Time"
+              }}
+            </p>
           </div>
           <div>
             <p class="font-weight-bold">
@@ -51,7 +72,11 @@
 
         <div class="hz-align">
           <div>
-            <p class="font-weight-bold">Check-in Date:</p>
+            <p class="font-weight-bold">
+              {{
+                extended_hours.length > 0 ? "Checked-in On" : "Check-in Date"
+              }}
+            </p>
           </div>
           <div>
             <p class="font-weight-bold">
@@ -66,7 +91,16 @@
             <p class="font-weight-bold text-h5">Total Fee</p>
           </div>
           <div>
-            <p class="font-weight-bold text-h5">₹ {{ amount }}</p>
+            <p class="font-weight-bold text-h5">
+              ₹
+              {{
+                extended_hours.length > 0
+                  ? extended_hours_payment_amount[
+                      extended_hours_payment_amount.length - 1
+                    ]
+                  : amount
+              }}
+            </p>
           </div>
         </div>
       </v-card>
@@ -131,7 +165,7 @@ import gsap from "gsap";
 export default {
   data() {
     return {
-      search_location: "Lekki Gardens Car Park",
+      search_location: null,
       no_of_slots: 0,
       no_of_hours: 0,
       check_in_time: "",
@@ -140,6 +174,9 @@ export default {
       dialog: false,
       amount: 0,
       razorpay_payment_id: null,
+      extended_hours: [],
+      extended_hours_payment_id: [],
+      extended_hours_payment_amount: [],
     };
   },
   methods: {
@@ -147,20 +184,31 @@ export default {
       this.dialog = false;
       if (this.razorpay_payment_id !== null) {
         this.$router.push("/booking-details");
+      } else {
+        this.$router.push("/home");
       }
     },
     makePayment() {
       const options = {
         key: process.env.VUE_APP_RAZORPAY_KEY_ID,
-        amount: this.amount * 100, // 1000 paise = INR 10
+        amount:
+          this.extended_hours.length > 0
+            ? this.extended_hours_payment_amount[
+                this.extended_hours_payment_amount.length - 1
+              ] * 100
+            : this.amount * 100, // 100 paise = INR 1
         name: "CAR PARK",
         description:
           "Booking " +
           this.no_of_slots +
           (this.no_of_slots > 1 ? " Slots " : " Slot ") +
           "for " +
-          this.no_of_hours +
-          (this.no_of_hours >= 10 ? " hours " : " hour"),
+          (this.extended_hours.length > 0
+            ? this.extended_hours[this.extended_hours.length - 1] +
+              (this.extended_hours[this.extended_hours.length - 1] > 1
+                ? " Hours"
+                : " Hour")
+            : this.no_of_hours + (this.no_of_hours > 1 ? " Hours" : " Hour")),
         image: "https://tinyurl.com/4bcy9a3y",
         handler: (response) => this.onPaymentSuccess(response),
         prefill: {
@@ -178,14 +226,38 @@ export default {
       rzp.on("payment.failed", (error) => this.onPaymentFailure(error));
     },
     onPaymentSuccess(response) {
-      this.spot_booked = true;
-      this.dialog = true;
-      this.razorpay_payment_id = response.razorpay_payment_id;
-      this.$store.commit("setPaymentID", response.razorpay_payment_id);
-      this.$store.commit("setPaymentAmount", this.amount);
-      this.$store.commit("setUpcomingList");
-      this.updateSpotStatus();
-      this.updateUpcomingListInDB();
+      if (this.extended_hours.length === 0) {
+        this.spot_booked = true;
+        this.dialog = true;
+        this.razorpay_payment_id = response.razorpay_payment_id;
+        this.$store.commit("setPaymentID", response.razorpay_payment_id);
+        this.$store.commit("setPaymentAmount", this.amount);
+        this.$store.commit("setUpcomingList");
+        this.updateSpotStatus();
+        this.updateUpcomingListInDB();
+      } else {
+        this.extended_hours_payment_id.push(response.razorpay_payment_id);
+        this.$store.commit("setInProgressList", {
+          no_of_slots: this.$store.state.booking_details.no_of_slots,
+          no_of_hours: this.$store.state.booking_details.no_of_hours,
+          check_in_time: this.$store.state.booking_details.check_in_time,
+          check_in_date: this.$store.state.booking_details.check_in_date,
+          location: this.$store.state.booking_details.location,
+          location_id: this.$store.state.booking_details.location_id,
+          payment_id: this.$store.state.booking_details.payment_id,
+          payment_amount: this.$store.state.booking_details.payment_amount,
+          rating: this.$store.state.booking_details.rating,
+          extended_hours: this.$store.state.booking_details.extended_hours,
+          extended_hours_payment_id: this.extended_hours_payment_id,
+          extended_hours_payment_amount:
+            this.$store.state.booking_details.extended_hours_payment_amount,
+        });
+
+        this.updateInprogressListInDB();
+        this.spot_booked = true;
+        this.dialog = true;
+        console.log(this.$store.state.inprogress_list);
+      }
     },
     onPaymentFailure(response) {
       this.razorpay_payment_id = null;
@@ -235,6 +307,18 @@ export default {
           alert("Error while updating upcoming list: " + error.message)
         );
     },
+    async updateInprogressListInDB() {
+      await firebase
+        .firestore()
+        .collection("inprogress_list")
+        .doc(this.$store.state.user.user_id)
+        .set({
+          list: this.$store.state.inprogress_list,
+        })
+        .catch((error) =>
+          alert("Error while updating inprogress list: " + error.message)
+        );
+    },
   },
   mounted() {
     if (this.$store.state.user === null) {
@@ -249,7 +333,8 @@ export default {
       stagger: 0.2,
     });
 
-    this.$store.commit("setPaymentID", null);
+    if (this.$store.state.booking_details.extended_hours.length === 0)
+      this.$store.commit("setPaymentID", null);
 
     let location_list = this.$store.state.location_list;
     this.search_location = this.$store.state.booking_details.location;
@@ -262,6 +347,14 @@ export default {
     this.check_in_time = this.$store.state.booking_details.check_in_time;
     this.check_in_date = this.$store.state.booking_details.check_in_date;
     this.no_of_hours = this.$store.state.booking_details.no_of_hours;
+
+    if (this.$store.state.booking_details.extended_hours.length > 0) {
+      this.extended_hours = this.$store.state.booking_details.extended_hours;
+      this.extended_hours_payment_id =
+        this.$store.state.booking_details.extended_hours_payment_id;
+      this.extended_hours_payment_amount =
+        this.$store.state.booking_details.extended_hours_payment_amount;
+    }
   },
 };
 </script>
