@@ -667,13 +667,64 @@
                 style="justify-content: space-between"
               >
                 <div>
-                  <p class="mt-2 mb-0">{{ item.check_in_date }}</p>
+                  <p class="mt-2 mb-0">Expired At:</p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">{{ item.check_in_time }}</p>
+                  <p class="mt-2 mb-0">
+                    {{
+                      exitTime(
+                        item.check_in_date,
+                        item.check_in_time,
+                        item.no_of_hours + sumOfExtendedHours(item)
+                      )
+                    }}
+                  </p>
                 </div>
                 <div>
-                  <p class="mt-2 mb-0">₹ {{ item.payment_amount }}</p>
+                  <p class="mt-2 mb-0">
+                    {{
+                      exitDate(
+                        item.check_in_date,
+                        item.check_in_time,
+                        item.no_of_hours + sumOfExtendedHours(item)
+                      )
+                    }}
+                  </p>
+                </div>
+              </div>
+              <hr class="mt-2" />
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">Total Duration:</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    {{ item.no_of_hours + sumOfExtendedHours(item) }}
+                    {{
+                      item.no_of_hours + sumOfExtendedHours(item) > 1
+                        ? " (Hrs.)"
+                        : " (Hr.)"
+                    }}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="hz-align pl-3 pr-5"
+                style="justify-content: space-between"
+              >
+                <div>
+                  <p class="mt-2 mb-0">Amount Paid:</p>
+                </div>
+                <div>
+                  <p class="mt-2 mb-0">
+                    ₹
+                    {{
+                      item.payment_amount + sumOfAmountForExtendedHours(item)
+                    }}
+                  </p>
                 </div>
               </div>
             </v-list-item-content>
@@ -788,7 +839,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
 
-                <v-btn class="mt-n3" icon @click="showPrivacy = !showPrivacy">
+                <v-btn class="mt-n10" icon @click="showPrivacy = !showPrivacy">
                   <v-icon>{{
                     showPrivacy ? "mdi-chevron-up" : "mdi-chevron-down"
                   }}</v-icon>
@@ -800,8 +851,156 @@
                   <v-divider></v-divider>
 
                   <v-card-text>
-                    I'm a thing. But, like most politicians, he promised more
-                    than he could deliver. You won't have time for sleeping,
+                    <div style="max-height: 180px; overflow: auto">
+                      This Terms of Service Agreement governs your use of this
+                      website car-park-ui.netlify.app offer of products for
+                      purchase on this Website, or your purchase of products
+                      available on this Website. This Agreement includes, and
+                      incorporates by this reference, the policies and
+                      guidelines referenced below. Car Park reserves the right
+                      to change or revise the terms and conditions of this
+                      Agreement at any time by posting any changes or a revised
+                      Agreement on this Website. Car Park will alert you that
+                      changes or revisions have been made by indicating on the
+                      top of this Agreement the date it was last revised. The
+                      changed or revised Agreement will be effective immediately
+                      after it is posted on this Website. Your use of the
+                      Website following the posting any such changes or of a
+                      revised Agreement will constitute your acceptance of any
+                      such changes or revisions. Car Park encourages you to
+                      review this Agreement whenever you visit the Website to
+                      make sure that you understand the terms and conditions
+                      governing use of the Website. This Agreement does not
+                      alter in any way the terms or conditions of any other
+                      written agreement you may have with Car Park for other
+                      products or services. If you do not agree to this
+                      Agreement (including any referenced policies or
+                      guidelines), please immediately terminate your use of the
+                      Website. If you would like to print this Agreement, please
+                      click the print button on your browser toolbar. I.
+                      PRODUCTS Terms of Offer. This Website offers for sale
+                      certain products (the "Products"). By placing an order for
+                      Products through this Website, you agree to the terms set
+                      forth in this Agreement. Customer Solicitation: Unless you
+                      notify our third party call center reps or direct Car Park
+                      sales reps, while they are calling you, of your desire to
+                      opt out from further direct company communications and
+                      solicitations, you are agreeing to continue to receive
+                      further emails and call solicitations Car Park and its
+                      designated in house or third party call team(s). Opt Out
+                      Procedure: We provide 3 easy ways to opt out of from
+                      future solicitations. 1. You may use the opt out link
+                      found in any email solicitation that you may receive. 2.
+                      You may also choose to opt out, via sending your email
+                      address to: edwssm777@gmail.com Proprietary Rights. Car
+                      Park has proprietary rights and trade secrets in the
+                      Products. You may not copy, reproduce, resell or
+                      redistribute any Product manufactured and/or distributed
+                      by Car Park .Car Park also has rights to all trademarks
+                      and trade dress and specific layouts of this webpage,
+                      including calls to action, text placement, images and
+                      other information. Sales Tax. If you purchase any
+                      Products, you will be responsible for paying any
+                      applicable sales tax. II. WEBSITE Content; Intellectual
+                      Property; Third Party Links. In addition to making
+                      Products available, this Website also offers information
+                      and marketing materials. This Website also offers
+                      information, both directly and through indirect links to
+                      third-party websites, about nutritional and dietary
+                      supplements. Car Park does not always create the
+                      information offered on this Website; instead the
+                      information is often gathered from other sources. To the
+                      extent that Car Park does create the content on this
+                      Website, such content is protected by intellectual
+                      property laws of the India, foreign nations, and
+                      international bodies. Unauthorized use of the material may
+                      violate copyright, trademark, and/or other laws. You
+                      acknowledge that your use of the content on this Website
+                      is for personal, noncommercial use. Any links to
+                      third-party websites are provided solely as a convenience
+                      to you. Car Park does not endorse the contents on any such
+                      third-party websites Car Park is not responsible for the
+                      content of or any damage that may result from your access
+                      to or reliance on these third-party websites. If you link
+                      to third-party websites, you do so at your own risk. Use
+                      of Website; Car Park is not responsible for any damages
+                      resulting from use of this website by anyone. You will not
+                      use the Website for illegal purposes. You will (1) abide
+                      by all applicable local, state, national, and
+                      international laws and regulations in your use of the
+                      Website (including laws regarding intellectual property),
+                      (2) not interfere with or disrupt the use and enjoyment of
+                      the Website by other users, (3) not resell material on the
+                      Website, (4) not engage, directly or indirectly, in
+                      transmission of "spam", chain letters, junk mail or any
+                      other type of unsolicited communication, and (5) not
+                      defame, harass, abuse, or disrupt other users of the
+                      Website License. By using this Website, you are granted a
+                      limited, non-exclusive, non-transferable right to use the
+                      content and materials on the Website in connection with
+                      your normal, noncommercial, use of the Website. You may
+                      not copy, reproduce, transmit, distribute, or create
+                      derivative works of such content or information without
+                      express written authorization from Car Park or the
+                      applicable third party (if third party content is at
+                      issue). Posting. By posting, storing, or transmitting any
+                      content on the Website, you hereby grant Car Park a
+                      perpetual, worldwide, non-exclusive, royalty-free,
+                      assignable, right and license to use, copy, display,
+                      perform, create derivative works from, distribute, have
+                      distributed, transmit and assign such content in any form,
+                      in all media now known or hereinafter created, anywhere in
+                      the world. Car Park does not have the ability to control
+                      the nature of the user-generated content offered through
+                      the Website. You are solely responsible for your
+                      interactions with other users of the Website and any
+                      content you post. Car Park is not liable for any damage or
+                      harm resulting from any posts by or interactions between
+                      users Car Park reserves the right, but has no obligation,
+                      to monitor interactions between and among users of the
+                      Website and to remove any content Car Park deems
+                      objectionable, in MuscleUP Nutrition 's sole discretion.
+                      III. DISCLAIMER OF WARRANTIES YOUR USE OF THIS WEBSITE
+                      AND/OR PRODUCTS ARE AT YOUR SOLE RISK. THE WEBSITE AND
+                      PRODUCTS ARE OFFERED ON AN "AS IS" AND "AS AVAILABLE"
+                      BASIS. Car Park EXPRESSLY DISCLAIMS ALL WARRANTIES OF ANY
+                      KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT
+                      LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+                      FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT WITH RESPECT
+                      TO THE PRODUCTS OR WEBSITE CONTENT, OR ANY RELIANCE UPON
+                      OR USE OF THE WEBSITE CONTENT OR PRODUCTS. ("PRODUCTS"
+                      INCLUDE TRIAL PRODUCTS.) WITHOUT LIMITING THE GENERALITY
+                      OF THE FOREGOING, Car Park MAKES NO WARRANTY: THAT THE
+                      INFORMATION PROVIDED ON THIS WEBSITE IS ACCURATE,
+                      RELIABLE, COMPLETE, OR TIMELY. THAT THE LINKS TO
+                      THIRD-PARTY WEBSITES ARE TO INFORMATION THAT IS ACCURATE,
+                      RELIABLE, COMPLETE, OR TIMELY. NO ADVICE OR INFORMATION,
+                      WHETHER ORAL OR WRITTEN, OBTAINED BY YOU FROM THIS WEBSITE
+                      WILL CREATE ANY WARRANTY NOT EXPRESSLY STATED HEREIN. AS
+                      TO THE RESULTS THAT MAY BE OBTAINED FROM THE USE OF THE
+                      PRODUCTS OR THAT DEFECTS IN PRODUCTS WILL BE CORRECTED.
+                      REGARDING ANY PRODUCTS PURCHASED OR OBTAINED THROUGH THE
+                      WEBSITE. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF
+                      CERTAIN WARRANTIES, SO SOME OF THE ABOVE EXCLUSIONS MAY
+                      NOT APPLY TO YOU. IV. LIMITATION OF LIABILITY Car Park
+                      ENTIRE LIABILITY, AND YOUR EXCLUSIVE REMEDY, IN LAW, IN
+                      EQUITY, OR OTHWERWISE, WITH RESPECT TO THE WEBSITE CONTENT
+                      AND PRODUCTS AND/OR FOR ANY BREACH OF THIS AGREEMENT IS
+                      SOLELY LIMITED TO THE AMOUNT YOU PAID, LESS SHIPPING AND
+                      HANDLING, FOR PRODUCTS PURCHASED VIA THE WEBSITE. … Car
+                      Park WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT,
+                      INCIDENTAL, SPECIAL OR CONSEQUENTIAL DAMAGES IN CONNECTION
+                      WITH THIS AGREEMENT OR THE PRODUCTS IN ANY MANNER,
+                      INCLUDING LIABILITIES RESULTING FROM (1) THE USE OR THE
+                      INABILITY TO USE THE WEBSITE CONTENT OR PRODUCTS; (2) THE
+                      COST OF PROCURING SUBSTITUTE PRODUCTS OR CONTENT; (3) ANY
+                      PRODUCTS PURCHASED OR OBTAINED OR TRANSACTIONS ENTERED
+                      INTO THROUGH THE WEBSITE; OR (4) ANY LOST PROFITS YOU
+                      ALLEGE. SOME JURISDICTIONS DO NOT ALLOW THE LIMITATION OR
+                      EXCLUSION OF LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL
+                      DAMAGES SO SOME OF THE ABOVE LIMITATIONS MAY NOT APPLY TO
+                      YOU.
+                    </div>
                   </v-card-text>
                 </div>
               </v-expand-transition>
@@ -813,7 +1012,7 @@
               <v-card-title> Privacy Policy </v-card-title>
 
               <v-card-subtitle>
-                Last update on : 20th Nov 2021
+                Last update on : 29th Mar 2022
               </v-card-subtitle>
 
               <v-card-actions>
@@ -831,8 +1030,28 @@
                   <v-divider></v-divider>
 
                   <v-card-text>
-                    I'm a thing. But, like most politicians, he promised more
-                    than he could deliver. You won't have time for sleeping,
+                  <div style="max-height:170px; overflow:auto">
+                    Force Majeure. Car Park will not be deemed in default
+                    hereunder or held responsible for any cessation,
+                    interruption or delay in the performance of its obligations
+                    hereunder due to earthquake, flood, fire, storm, natural
+                    disaster, act of God, war, terrorism, armed conflict, labor
+                    strike, lockout, or boycott. Cessation of Operation. … Car
+                    Park may at any time, in its sole discretion and without
+                    advance notice to you, cease operation of the Website and
+                    distribution of the Products. Entire Agreement. This
+                    Agreement comprises the entire agreement between you and ……
+                    Car Park and supersedes any prior agreements pertaining to
+                    the subject matter contained herein. Effect of Waiver. The
+                    failure of … Car Park to exercise or enforce any right or
+                    provision of this Agreement will not constitute a waiver of
+                    such right or provision. If any provision of this Agreement
+                    is found by a court of competent jurisdiction to be invalid,
+                    the parties nevertheless agree that the court should
+                    endeavor to give effect to the parties' intentions as
+                    reflected in the provision, and the other provisions of this
+                    Agreement remain in full force and effect.
+                    </div>
                   </v-card-text>
                 </div>
               </v-expand-transition>
@@ -1336,6 +1555,20 @@ export default {
         alert("Error while fetching progress list: " + error.message);
       });
 
+    await firebase
+      .firestore()
+      .collection("history_list")
+      .doc(this.$store.state.user.user_id)
+      .get()
+      .then((res) => {
+        if (res.exists) {
+          this.$store.commit("setHistoryListFromDB", res.data().list);
+        }
+      })
+      .catch((error) => {
+        alert("Error while fetching history list: " + error.message);
+      });
+
     // DB ops ENDS
 
     window.addEventListener("keyup", () => {
@@ -1361,6 +1594,71 @@ export default {
     this.location_list.forEach((location) => {
       this.location_list_names.push(location.name);
     });
+
+    this.upcomimg_list.forEach((item) => {
+      if (
+        new Date(
+          item.check_in_date + "T" + item.check_in_time + ":00.000+05:30"
+        ).valueOf() <= new Date().valueOf()
+      ) {
+        this.upcomimg_list.splice(this.upcomimg_list.indexOf(item), 1);
+        this.inprogress_list.unshift(item);
+      }
+    });
+
+    this.inprogress_list.forEach((item) => {
+      let date = new Date(
+        new Date(
+          item.check_in_date + "T" + item.check_in_time + ":00.000+05:30"
+        ).valueOf() +
+          item.no_of_hours * 60 * 60 * 1000
+      ).valueOf();
+
+      if (date <= new Date().valueOf()) {
+        this.inprogress_list.splice(this.inprogress_list.indexOf(item), 1);
+        this.history_list.unshift(item);
+      }
+    });
+
+    this.$store.commit("setUpcomingListFromDB", this.upcomimg_list);
+    this.$store.commit("setInProgressListFromDB", this.inprogress_list);
+    this.$store.commit("setHistoryListFromDB", this.history_list);
+
+    firebase
+      .firestore()
+      .collection("upcoming_list")
+      .doc(this.$store.state.user.user_id)
+      .set(
+        {
+          list: this.$store.state.upcomimg_list,
+        },
+        { merge: true }
+      )
+      .catch((error) =>
+        alert("Error while updating upcoming list: " + error.message)
+      );
+
+    firebase
+      .firestore()
+      .collection("inprogress_list")
+      .doc(this.$store.state.user.user_id)
+      .set({
+        list: this.$store.state.inprogress_list,
+      })
+      .catch((error) =>
+        alert("Error while updating inprogress list: " + error.message)
+      );
+
+    firebase
+      .firestore()
+      .collection("history_list")
+      .doc(this.$store.state.user.user_id)
+      .set({
+        list: this.$store.state.history_list,
+      })
+      .catch((error) =>
+        alert("Error while updating history list: " + error.message)
+      );
 
     // const location_list = [
     //   {

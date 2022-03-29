@@ -8,19 +8,7 @@ export default new Vuex.Store({
     user: null,
     location_list: [],
     favorite_list: [],
-    history_list: [
-      {
-        no_of_slots: 1,
-        no_of_hours: 10,
-        check_in_time: "10:00",
-        check_in_date: "2020-06-01",
-        location: "Lekki Gardens Car Park",
-        location_id: "loc1",
-        payment_id: "expired",
-        payment_amount: 101,
-        rating: 3,
-      },
-    ],
+    history_list: [],
     upcomimg_list: [],
     inprogress_list: [],
     locked_location: {},
@@ -64,6 +52,9 @@ export default new Vuex.Store({
     },
     setInProgressListFromDB(state, payload) {
       state.inprogress_list = payload;
+    },
+    setHistoryListFromDB(state, payload) {
+      state.history_list = payload;
     },
   },
 });
